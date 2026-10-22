@@ -10,7 +10,7 @@ import { Verdict } from "./Verdict";
 
 const PAGE = 50;
 const MAX = 500; // tope del API por consulta (backend: Query(50, le=500))
-const SHAPE: Record<SignVerdict, string> = { sign: "up", watch: "dot", no: "down" };
+const SHAPE: Record<SignVerdict, string> = { sign: "up", promising: "half", watch: "dot", no: "down" };
 
 type Filters = { status: string; role: "" | "SP" | "RP"; throws: "" | "Right" | "Left"; sort: "home" | "neutral" | "fit" };
 type FullList = { rows: FreeAgentRow[]; total: number; medians: Record<string, number | null>; missing: number };
@@ -74,7 +74,7 @@ export function FreeAgentTable({ compact = false }: { compact?: boolean }) {
 
   const all = useMemo(() => (home ? (compact ? small.data?.rows : full.data?.rows) ?? null : null), [home, compact, small.data, full.data]);
   const counts = useMemo(() => {
-    const c: Record<SignVerdict, number> = { sign: 0, watch: 0, no: 0 };
+    const c: Record<SignVerdict, number> = { sign: 0, promising: 0, watch: 0, no: 0 };
     if (home) for (const r of all ?? []) c[signingFor(r, scaleOf(home, r)).verdict]++;
     return c;
   }, [all, home]);
@@ -98,7 +98,7 @@ export function FreeAgentTable({ compact = false }: { compact?: boolean }) {
           <button type="button" className={verdict === "" ? "on" : ""} aria-pressed={verdict === ""} onClick={() => { setVerdict(""); reset(); }}>
             {t("faAll")} <span className="num">{all ? all.length : "…"}</span>
           </button>
-          {(["sign", "watch", "no"] as const).map((v) => (
+          {(["sign", "promising", "watch", "no"] as const).map((v) => (
             <button key={v} type="button" className={`v-${v} ${verdict === v ? "on" : ""}`} aria-pressed={verdict === v} onClick={() => { setVerdict(v); reset(); }}>
               <span className={`v-shape ${SHAPE[v]}`} aria-hidden="true" />{t(`v_${v}` as Key)} <span className="num">{all ? counts[v] : "…"}</span>
             </button>
@@ -173,7 +173,7 @@ function FaRow({ r, compact, home }: { r: FreeAgentRow; compact: boolean; home: 
   const hand = r.throws === "Right" ? t("right") : t("left");
   return (
     <li className="fa-row">
-      <div className="fa-verdict"><Verdict kind={s.verdict} note={s.smallSample ? t("smallSample") : undefined} /></div>
+      <div className="fa-verdict"><Verdict kind={s.verdict} note={s.smallSample && s.verdict !== "promising" ? t("smallSample") : undefined} /></div>
       <div className="fa-who">
         <Link to={`/lanzador/${r.pitcher_id}`} className="fa-name num">{r.name}</Link>
         <span className="fa-meta">
