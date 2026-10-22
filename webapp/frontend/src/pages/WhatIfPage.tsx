@@ -1,11 +1,13 @@
 import { useId } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import type { FreeAgents, LeaderRow, Projection, Stadium } from "../api";
+import { LoopVideo } from "../components/LoopVideo";
 import { MovementPlot } from "../components/MovementPlot";
 import { SearchBox } from "../components/SearchBox";
 import { Term } from "../components/Term";
 import { Verdict } from "../components/Verdict";
 import { fmtInt, useLang } from "../i18n";
+import { VIDEO } from "../media";
 import { pitchName, pitchPhrase, vsSea } from "../phrases";
 import { PITCH_COLORS, fmt, signed, useApi, useAppState, useParkScale } from "../state";
 import { verdictFor, type ParkScale } from "../verdicts";
@@ -38,6 +40,9 @@ export default function WhatIfPage() {
       <h1>{t("wiTitle")}</h1>
       <p className="muted lede">{t("wiHint")}</p>
 
+      <div className={pid ? undefined : "wi-empty"}>
+      {!pid && <LoopVideo {...VIDEO.pitcherVertical} ratio="4 / 5" className="wi-pitcher" />}
+      <div className="wi-empty-main">
       <section className="wi-controls panel" aria-label={t("pickPitcher")}>
         <SearchBox pitchersOnly onPickPitcher={(p) => update({ p })} placeholder={t("pickPitcher") + "…"} />
         <label htmlFor={parkId} className="wi-park">
@@ -62,6 +67,8 @@ export default function WhatIfPage() {
           ) : <div className="skel skel-line" />}
         </section>
       )}
+      </div>
+      </div>
 
       {pid && error && <div className="empty-note"><p>{t("error")}</p><button type="button" className="btn" onClick={retry}>{t("retry")}</button></div>}
       {pid && !error && !ready && <div className="skel skel-card" aria-busy="true" />}

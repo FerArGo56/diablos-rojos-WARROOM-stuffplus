@@ -1,19 +1,26 @@
 import { useEffect, useRef, useState } from "react";
 import { useLang } from "../i18n";
+import { hasVideo, type VideoFile } from "../media";
 
-export type LoopVideoSource = {
-  src: string;          // MP4 (H.264) para que funcione en iPhone
-  poster: string;       // imagen fija: lo que se ve antes de cargar y con reduced-motion
-  label?: string;       // si el video comunica algo; sin label es decorativo
-  ratio?: string;       // relación de aspecto, p. ej. "16 / 9"
+type Props = VideoFile & {
+  label?: string;                 // si el video comunica algo; sin label es decorativo
+  ratio?: string;                 // relación de aspecto del contenedor, p. ej. "16 / 9"
+  variant?: "inline" | "background";
+  className?: string;
 };
 
-/** Video en bucle, silencioso y ligero:
- *  - el archivo solo se descarga cuando el video está por aparecer en pantalla;
+/** Video en bucle, silencioso y ligero. No se pinta si el video no está en public/video/.
+ *  - el archivo solo se descarga cuando el video está por aparecer en pantalla (mientras, el póster);
  *  - se pausa fuera de pantalla o con la pestaña oculta;
- *  - con reduced-motion o ahorro de datos no arranca solo (queda el póster);
- *  - siempre hay un botón para pausar o reproducir. */
-export function LoopVideo({ src, poster, label, ratio = "16 / 9" }: LoopVideoSource) {
+ *  - con reduced-motion o ahorro de datos no arranca solo: queda el póster;
+ *  - siempre hay un botón para pausar o reproducir.
+ *  `background`: ocupa su contenedor (posición absoluta) para ir detrás de un encabezado. */
+export function LoopVideo({ src, poster, label, ratio = "16 / 9", variant = "inline", className = "" }: Props) {
+  if (!hasVideo({ src, poster })) return null;
+  return <LoopVideoPlayer src={src} poster={poster} label={label} ratio={ratio} variant={variant} className={className} />;
+}
+
+function LoopVideoPlayer({ src, poster, label, ratio, variant, className }: Required<Omit<Props, "label">> & { label?: string }) {
   const { t } = useLang();
   const box = useRef<HTMLDivElement>(null);
   const video = useRef<HTMLVideoElement>(null);
@@ -48,7 +55,7 @@ export function LoopVideo({ src, poster, label, ratio = "16 / 9" }: LoopVideoSou
   }, [shouldPlay, near]);
 
   return (
-    <div ref={box} className="loop-video" style={{ aspectRatio: ratio }}>
+    <div ref={box} className={`loop-video loop-video-${variant} ${className}`} style={variant === "inline" ? { aspectRatio: ratio } : undefined}>
       <video ref={video} poster={poster} muted loop playsInline preload="none"
         aria-label={label} aria-hidden={label ? undefined : true}
         onPlay={() => setPlaying(true)} onPause={() => setPlaying(false)}>

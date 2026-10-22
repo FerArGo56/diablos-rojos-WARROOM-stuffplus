@@ -1,9 +1,7 @@
 import { useId, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import type { Profile, Projection, Stadium } from "../api";
-import { LoopVideo } from "../components/LoopVideo";
 import { Term } from "../components/Term";
-import { VIDEOS } from "../media";
 import { Verdict } from "../components/Verdict";
 import { PITCH_NAMES, fmtDate, fmtInt, useLang } from "../i18n";
 import { PARK_SPREAD_MIN, pitchPhrase } from "../phrases";
@@ -76,8 +74,6 @@ export default function PitcherPage() {
           )}
         </aside>
       </section>
-
-      {VIDEOS.lanzador && <LoopVideo {...VIDEOS.lanzador} />}
 
       <section className="panel" aria-labelledby="arsenal-title">
         <h2 id="arsenal-title" className="section-label">{t("profileArsenal")} {p.season} · {t("altitudeHere")}</h2>

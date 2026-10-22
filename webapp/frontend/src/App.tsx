@@ -2,7 +2,7 @@ import { useEffect, useRef } from "react";
 import { Navigate, NavLink, Route, Routes, useLocation } from "react-router-dom";
 import { InstallHint, OfflineBanner } from "./components/AppNotices";
 import { BottomNav } from "./components/BottomNav";
-import { IntroSplash } from "./components/IntroSplash";
+import { IntroVideo } from "./components/IntroVideo";
 import { Diablo } from "./components/Diablo";
 import { useLang } from "./i18n";
 import { useAppState } from "./state";
@@ -44,7 +44,6 @@ export default function App() {
       </header>
       {meta?.synthetic && <div className="banner">{t("syntheticBanner")}</div>}
       <OfflineBanner />
-      <InstallHint />
       <div id="main" tabIndex={-1} className="route" key={pathname}>
         <Routes>
           <Route path="/" element={<TodayPage />} />
@@ -57,8 +56,10 @@ export default function App() {
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </div>
+      {/* el aviso de instalación va al final: si aparece tarde (Android), no empuja el contenido */}
+      <InstallHint />
       <BottomNav />
-      <IntroSplash />
+      <IntroVideo />
     </>
   );
 }
