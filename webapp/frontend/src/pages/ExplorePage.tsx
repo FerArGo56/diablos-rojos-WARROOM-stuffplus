@@ -4,11 +4,12 @@ import { FreeAgentTable } from "../components/FreeAgentTable";
 import { MexicoMap } from "../components/MexicoMap";
 import { ScheduleCalendar } from "../components/ScheduleCalendar";
 import { SearchBox } from "../components/SearchBox";
-import { useLang } from "../i18n";
-import { useApi } from "../state";
+import { Link } from "react-router-dom";
+import { fmtInt, useLang } from "../i18n";
+import { altitudeColor, useApi } from "../state";
 
 export default function ExplorePage() {
-  const { t } = useLang();
+  const { t, lang } = useLang();
   const { data: stadiums } = useApi<Stadium[]>("/stadiums");
   const [highlight, setHighlight] = useState<string | null>(null);
   const onHighlight = useCallback((id: string | null) => setHighlight(id), []);
@@ -26,7 +27,17 @@ export default function ExplorePage() {
       </section>
       <div className="home-grid">
         <section className="panel">
-          {stadiums ? <MexicoMap stadiums={stadiums} highlightId={highlight} /> : <div className="empty-state">{t("loading")}</div>}
+          {stadiums ? <MexicoMap stadiums={stadiums} highlightId={highlight} /> : <div className="skel skel-card" aria-busy="true" />}
+          {alt.length > 0 && (
+            <details className="tech park-list">
+              <summary>{t("parksList")}</summary>
+              <ol>
+                {alt.map((s) => (
+                  <li key={s.id}><Link to={`/estadio/${s.id}`}><span className="dot" style={{ background: altitudeColor(s.altitude_m) }} aria-hidden="true" /><span>{s.venue_name}</span><span className="faint small">{s.city}</span><span className="num">{fmtInt(lang, s.altitude_m)} m</span></Link></li>
+                ))}
+              </ol>
+            </details>
+          )}
           {alt.length > 0 && (
             <div className="stats-row" style={{ marginTop: 14, borderTop: "1px solid var(--line)", paddingTop: 14 }}>
               <div className="stat"><span className="v num">{alt[0].altitude_m.toLocaleString()} m</span><span className="l">{alt[0].team_code} · {t("altitude")}</span></div>

@@ -26,7 +26,7 @@ function seriesOf(games: Game[], date: string): Game[] {
 export default function TodayPage() {
   const { t, lang } = useLang();
   const { meta, selectedDate, setSelectedDate } = useAppState();
-  const { data: bp, error } = useApi<Bullpen>("/bullpen", { on: selectedDate ?? undefined });
+  const { data: bp, error, retry } = useApi<Bullpen>("/bullpen", { on: selectedDate ?? undefined });
   const { data: sched } = useApi<Schedule>("/schedule");
   const sid = bp?.available ? bp.stadium.id : null;
   const { data: st } = useApi<StadiumDetail>(sid ? `/stadiums/${sid}` : null);
@@ -37,7 +37,7 @@ export default function TodayPage() {
   const series = useMemo(() => (date ? seriesOf(games, date) : []), [games, date]);
   const played = games.find((g) => g.date === date && g.result);
 
-  if (error) return <main className="page today"><EmptyNote text={t("error")} /></main>;
+  if (error) return <main className="page today"><EmptyNote text={t("error")} onRetry={retry} /></main>;
   if (bp && !bp.available) return <main className="page today"><EmptyNote text={t("noSchedule")} /></main>;
   if (!bp || !date) return <main className="page today" aria-busy="true"><div className="skel skel-bug" /><div className="skel skel-line" /><div className="skel skel-card" /></main>;
 
@@ -123,13 +123,14 @@ export default function TodayPage() {
   );
 }
 
-function EmptyNote({ text }: { text: string }) {
+function EmptyNote({ text, onRetry }: { text: string; onRetry?: () => void }) {
   const { t } = useLang();
   return (
     <div className="empty-note">
       <Diablo size={44} still />
       <div>
         <p>{text}</p>
+        {onRetry && <button type="button" className="btn" onClick={onRetry} style={{ marginRight: 8 }}>{t("retry")}</button>}
         <Link to="/explorar" className="btn">{t("goExplore")}</Link>
       </div>
     </div>

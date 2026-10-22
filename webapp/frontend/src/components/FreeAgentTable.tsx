@@ -21,6 +21,7 @@ const SORT_KEY = { home: "stuff_home", neutral: "stuff_neutral", fit: "fit" } as
  *  Como el API entrega máximo 500 por consulta, se pide por rol × mano y se junta. */
 function useFullList(f: Filters | null) {
   const [state, setState] = useState<{ data: FullList | null; error: boolean }>({ data: null, error: false });
+  const [attempt, setAttempt] = useState(0);
   const key = f ? JSON.stringify(f) : null;
   useEffect(() => {
     if (!f) return;
@@ -39,8 +40,8 @@ function useFullList(f: Filters | null) {
       .catch(() => { if (alive) setState({ data: null, error: true }); });
     return () => { alive = false; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [key]);
-  return state;
+  }, [key, attempt]);
+  return { ...state, retry: () => setAttempt((n) => n + 1) };
 }
 
 export function FreeAgentTable({ compact = false }: { compact?: boolean }) {
@@ -61,6 +62,7 @@ export function FreeAgentTable({ compact = false }: { compact?: boolean }) {
   const noStaff = !!medians && Object.values(medians).every((v) => v == null);
   const sort = noStaff && pickedSort === "fit" ? "home" : pickedSort;
   const error = compact ? small.error : full.error;
+  const retry = compact ? small.retry : full.retry;
 
   const all = useMemo(() => (compact ? small.data?.rows : full.data?.rows) ?? null, [compact, small.data, full.data]);
   const counts = useMemo(() => {
@@ -130,7 +132,7 @@ export function FreeAgentTable({ compact = false }: { compact?: boolean }) {
         </p>
       )}
 
-      {error && <p className="muted">{t("error")}</p>}
+      {error && <div className="empty-note"><p>{t("error")}</p><button type="button" className="btn" onClick={retry}>{t("retry")}</button></div>}
       {!shown && !error && <div className="skel skel-card" aria-busy="true" />}
       {shown && filtered && (
         <>
