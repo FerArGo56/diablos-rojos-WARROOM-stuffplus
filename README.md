@@ -62,10 +62,53 @@ El detalle de cada paso está en [`apis/README.md`](apis/README.md).
 - **H4:** "Shape over label": el movimiento observado importa más que el spin rate por sí solo.
 
 ## Cómo trabajamos
+`main` está protegida: **nadie sube cambios directo a `main`**. Todo cambio pasa por una rama y un Pull Request que aprueba otro compañero.
 
-- Cada quien trabaja en su rama y abre un Pull Request a `main`, que necesita 1 aprobación.
+### 1. La primera vez: clonar el repo
+
+```bash
+git clone https://github.com/FerArGo56/diablos-rojos-WARROOM-stuffplus.git
+```
+
+### 2. Antes de empezar algo nuevo: actualizar `main` y crear tu rama
+
+```bash
+git checkout main
+git pull
+git checkout -b tipo/descripcion-corta
+```
+
+Nombres de rama según el tipo de cambio:
+
+| Prefijo | Para qué | Ejemplo |
+|---|---|---|
+| `feat/` | Algo nuevo | `feat/modelos-desde-api1` |
+| `fix/` | Arreglar un error | `fix/rangos-altitud` |
+| `docs/` | Solo documentación | `docs/readme-webapp` |
+
+### 3. Guardar y subir tus cambios
+
+```bash
+git add <archivos que cambiaste>
+git commit -m "Qué cambiaste, en una frase"
+git push -u origin tipo/descripcion-corta
+```
+
+### 4. Abrir el Pull Request
+
+En GitHub aparece el botón **Compare & pull request**. Explica qué cambiaste y por qué, y pide revisión a un compañero.
+
+### 5. Revisión y merge
+
+- Un compañero revisa y aprueba. **Nadie puede aprobar su propio Pull Request.**
+- Con la aprobación, se hace **Merge** en GitHub y se borra la rama.
+- Después, todos actualizan su copia con `git checkout main` y `git pull`.
+
+### Reglas
+
 - **Antes de cada commit, borra las salidas de los notebooks** (Kernel → Restart & Clear Output). Muestran tablas sacadas de los datos.
 - **Nunca uses `git add -f`.** El `.gitignore` bloquea datos y llaves por una razón.
+- **Una rama por tarea.** Si son dos cosas distintas, son dos Pull Requests.
 
 ## Referencias
 
