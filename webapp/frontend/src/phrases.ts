@@ -7,6 +7,8 @@ type T = ReturnType<typeof useLang>["t"];
 
 /** Diferencia mínima de movimiento (pulgadas) para mencionarla. */
 export const MOVE_MIN_IN = 1.5;
+/** Diferencia mínima entre su mejor y su peor parque para decir "Úsalo en / Evítalo en". */
+export const PARK_SPREAD_MIN = 3;
 /** Diferencia mínima de Stuff+ para aconsejar usarlo más o menos. */
 const ADVICE_MIN_STUFF = 2;
 
@@ -75,4 +77,19 @@ export function pitcherPhrase(t: T, lang: Lang, r: { role: string; fit?: number 
   parts.push(Math.abs(a) < 0.5 ? t(k.same) : t(a > 0 ? k.gain : k.lose, { n: num(lang, Math.abs(a)) }));
   if (r.best_pitch) parts.push(t("ph_best", { p: pitchName(lang, r.best_pitch, true) }));
   return parts.join(" ");
+}
+
+/** Efecto del parque en un tipo de pitcheo de la liga, sin sujeto: "sube 3.6 in menos · se abre 2.1 in menos". */
+export function leaguePitchEffect(t: T, lang: Lang, r: { ivb_sea: number; ivb_here: number; hb_sea: number; hb_here: number }): { text: string; keptPct: number } {
+  const dv = Math.abs(r.ivb_here) - Math.abs(r.ivb_sea);
+  const dh = Math.abs(r.hb_here) - Math.abs(r.hb_sea);
+  const parts: string[] = [];
+  if (Math.abs(dv) >= MOVE_MIN_IN) {
+    const key: Key = r.ivb_sea >= 0 ? (dv < 0 ? "lp_rise_less" : "lp_rise_more") : (dv < 0 ? "lp_drop_less" : "lp_drop_more");
+    parts.push(t(key, { n: num(lang, Math.abs(dv)) }));
+  }
+  if (Math.abs(dh) >= MOVE_MIN_IN) parts.push(t(dh < 0 ? "lp_side_less" : "lp_side_more", { n: num(lang, Math.abs(dh)) }));
+  const sea = Math.hypot(r.ivb_sea, r.hb_sea);
+  const keptPct = sea > 0 ? Math.round((Math.hypot(r.ivb_here, r.hb_here) / sea) * 100) : 100;
+  return { text: parts.length ? parts.join(" · ") : t("lp_same"), keptPct };
 }
