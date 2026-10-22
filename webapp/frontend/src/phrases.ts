@@ -62,15 +62,17 @@ export function parkPhrase(t: T, lang: Lang, st: Pick<StadiumDetail, "movement_r
   return t("park_lose", { pct: lost, p: pitchName(lang, worst.pitch_type, true) });
 }
 
-/** Una frase por lanzador: aporte al staff (si se sabe), efecto de la altura y su mejor pitcheo. */
-export function pitcherPhrase(t: T, lang: Lang, r: { role: string; fit?: number | null; altitude_delta: number; best_pitch: string | null }): string {
+/** Una frase por lanzador: aporte al staff (si se sabe), efecto del parque y su mejor pitcheo.
+ *  `where`: "home" = Harp Helú (se dice "en la altura"); "here" = el parque que se está viendo. */
+export function pitcherPhrase(t: T, lang: Lang, r: { role: string; fit?: number | null; altitude_delta: number; best_pitch: string | null }, where: "home" | "here" = "home"): string {
   const parts: string[] = [];
   if (r.fit != null) {
     const u = t(r.role === "SP" ? "ph_unit_sp" : "ph_unit_rp");
     parts.push(r.fit >= 0 ? t("ph_fit_plus", { u, n: `+${num(lang, r.fit)}` }) : t("ph_fit_minus", { u, n: num(lang, Math.abs(r.fit)) }));
   }
   const a = r.altitude_delta;
-  parts.push(Math.abs(a) < 0.5 ? t("ph_alt_same") : t(a > 0 ? "ph_alt_gain" : "ph_alt_lose", { n: num(lang, Math.abs(a)) }));
+  const k = where === "home" ? { same: "ph_alt_same", gain: "ph_alt_gain", lose: "ph_alt_lose" } as const : { same: "ph_here_same", gain: "ph_here_gain", lose: "ph_here_lose" } as const;
+  parts.push(Math.abs(a) < 0.5 ? t(k.same) : t(a > 0 ? k.gain : k.lose, { n: num(lang, Math.abs(a)) }));
   if (r.best_pitch) parts.push(t("ph_best", { p: pitchName(lang, r.best_pitch, true) }));
   return parts.join(" ");
 }

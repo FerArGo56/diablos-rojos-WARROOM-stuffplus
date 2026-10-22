@@ -13,7 +13,7 @@ const DOW = { es: ["L", "M", "M", "J", "V", "S", "D"], en: ["M", "T", "W", "T", 
 
 export function ScheduleCalendar({ onHighlight }: { onHighlight?: (stadiumId: string | null) => void }) {
   const { t, lang } = useLang();
-  const { selectedDate, setSelectedDate, setBullpenOpen } = useAppState();
+  const { selectedDate, setSelectedDate } = useAppState();
   const { data } = useApi<Schedule>("/schedule");
   const byDate = useMemo(() => {
     const m = new Map<string, Game[]>();
@@ -57,9 +57,9 @@ export function ScheduleCalendar({ onHighlight }: { onHighlight?: (stadiumId: st
           {data.record && <div className="muted small">{t("record")} <span className="num">{data.record.w}-{data.record.l}</span></div>}
         </div>
         <div className="cal-head" style={{ gap: 6, margin: 0 }}>
-          <button className="btn" style={{ padding: "4px 10px" }} disabled={idx <= 0} onClick={() => setMonth(months[idx - 1])} aria-label="prev">‹</button>
+          <button className="btn" style={{ padding: "4px 10px" }} disabled={idx <= 0} onClick={() => setMonth(months[idx - 1])} aria-label={MONTHS[lang][(m + 10) % 12]}>‹</button>
           <h3 style={{ minWidth: 110, textAlign: "center" }}>{MONTHS[lang][m - 1]}</h3>
-          <button className="btn" style={{ padding: "4px 10px" }} disabled={idx >= months.length - 1} onClick={() => setMonth(months[idx + 1])} aria-label="next">›</button>
+          <button className="btn" style={{ padding: "4px 10px" }} disabled={idx >= months.length - 1} onClick={() => setMonth(months[idx + 1])} aria-label={MONTHS[lang][m % 12]}>›</button>
         </div>
       </div>
       <div className="cal-grid">
@@ -92,7 +92,7 @@ export function ScheduleCalendar({ onHighlight }: { onHighlight?: (stadiumId: st
             </div>
           </div>
         )}
-        <button className="btn primary" onClick={() => setBullpenOpen(true)}><Diablo size={18} still /> {t("bullpenTitle")}</button>
+        <Link to="/" className="btn primary"><Diablo size={18} still /> {t("seeInToday")}</Link>
       </div>
     </div>
   );

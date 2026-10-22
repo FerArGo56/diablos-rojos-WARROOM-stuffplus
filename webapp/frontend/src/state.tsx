@@ -54,16 +54,13 @@ type AppState = {
   meta: Meta | null;
   selectedDate: string | null;
   setSelectedDate: (d: string | null) => void;
-  bullpenOpen: boolean;
-  setBullpenOpen: (o: boolean) => void;
 };
 const Ctx = createContext<AppState>(null!);
 
 export function AppStateProvider({ children }: { children: ReactNode }) {
   const [meta, setMeta] = useState<Meta | null>(null);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
-  const [bullpenOpen, setBullpenOpen] = useState(false);
   useEffect(() => { api<Meta>("/meta").then(setMeta).catch(() => setMeta(null)); }, []);
-  return <Ctx.Provider value={{ meta, selectedDate, setSelectedDate, bullpenOpen, setBullpenOpen }}>{children}</Ctx.Provider>;
+  return <Ctx.Provider value={{ meta, selectedDate, setSelectedDate }}>{children}</Ctx.Provider>;
 }
 export const useAppState = () => useContext(Ctx);

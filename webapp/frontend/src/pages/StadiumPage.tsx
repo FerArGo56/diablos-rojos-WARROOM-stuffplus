@@ -32,7 +32,7 @@ export default function StadiumPage() {
 
   return (
     <main className="page">
-      <Link to="/" className="muted small">← {t("backToMap")}</Link>
+      <Link to="/explorar" className="muted small back-link">← {t("backToMap")}</Link>
       <section className="stadium-hero" style={{ marginTop: 10 }}>
         <div>
           <div className="eyebrow">{st.team_name} · {st.zone === "Norte" ? t("zoneNorte") : t("zoneSur")}</div>
