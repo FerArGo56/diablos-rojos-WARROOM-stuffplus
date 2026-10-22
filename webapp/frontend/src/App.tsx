@@ -23,7 +23,7 @@ export default function App() {
       <a href="#main" className="skip-link">{t("skipToContent")}</a>
       <header className="topbar">
         <NavLink to="/" className="brand" aria-label={t("appName")}>
-          <Diablo size={30} still />
+          <Diablo size={30} />
           <span>Diablos Stuff<span className="plus">+</span></span>
         </NavLink>
         <nav className="nav nav-desktop" aria-label={t("mainNav")}>
