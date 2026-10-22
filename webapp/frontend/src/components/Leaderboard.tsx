@@ -4,6 +4,7 @@ import type { LeaderRow } from "../api";
 import { PITCH_NAMES, useLang } from "../i18n";
 import { Term } from "./Term";
 import { PITCH_COLORS, fmt, signed, stuffColor, useApi, useAppState, useParkScale } from "../state";
+import { PitcherName } from "./PitcherName";
 
 type Board = { stadium_id: string; season: number; min_pitches: number; total: number; rows: LeaderRow[] };
 
@@ -61,7 +62,7 @@ export function Leaderboard({ stadiumId, venueName, onPick, onClose }: { stadium
                 <tr key={r.pitcher_id} className="clickable" onClick={() => (onPick ? onPick(r.pitcher_id) : navigate(`/lanzador/${r.pitcher_id}`))}
                   style={r.status === ourTeam ? { background: "rgba(213,16,47,0.10)" } : undefined}>
                   <td className="num" style={{ color: r.rank <= 3 ? "var(--gold)" : "var(--muted)", fontWeight: 700 }}>{r.rank}</td>
-                  <td><Link to={`/lanzador/${r.pitcher_id}`} className="num" style={{ fontWeight: 600 }} onClick={(e) => e.stopPropagation()}>{r.name}</Link> <span className="faint small">{r.throws === "Right" ? "R" : "L"} · {r.role}</span></td>
+                  <td><Link to={`/lanzador/${r.pitcher_id}`} onClick={(e) => e.stopPropagation()}><PitcherName name={r.name} /></Link> <span className="faint small">{r.throws === "Right" ? "R" : "L"} · {r.role}</span></td>
                   <td>{r.status === "FA" ? <span className="chip gold">{t("freeAgent")}</span> : <span className={`chip ${r.status === ourTeam ? "red" : ""}`}>{r.status}</span>}</td>
                   <td>{r.best_pitch && <span style={{ display: "inline-flex", gap: 6, alignItems: "center" }}><span className="dot" style={{ background: PITCH_COLORS[r.best_pitch] }} />{PITCH_NAMES[lang][r.best_pitch]}</span>}</td>
                   <td className="r num" style={{ color: stuffColor(r.stuff_plus, scale), fontWeight: 700 }}>{fmt(r.stuff_plus)}</td>

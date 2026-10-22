@@ -11,6 +11,7 @@ import { VIDEO } from "../media";
 import { pitchName, pitchPhrase, vsSea } from "../phrases";
 import { PITCH_COLORS, fmt, signed, useApi, useAppState, useParkScale } from "../state";
 import { verdictFor, type ParkScale } from "../verdicts";
+import { PitcherName } from "../components/PitcherName";
 
 /** ¿Y si…? modo 1: un lanzador real en cualquier parque, con los endpoints que ya existen. */
 export default function WhatIfPage() {
@@ -60,7 +61,7 @@ export default function WhatIfPage() {
             <div className="wi-quick">
               {top.rows.map((r) => (
                 <button key={r.pitcher_id} type="button" className="btn" onClick={() => update({ p: r.pitcher_id })}>
-                  <span className="num">{r.name}</span> <Verdict kind={verdictFor(r.stuff_plus, scale)} size="sm" />
+                  <PitcherName name={r.name} /> <Verdict kind={verdictFor(r.stuff_plus, scale)} size="sm" />
                 </button>
               ))}
             </div>
@@ -92,7 +93,7 @@ function Result({ proj, fa, scale, isHome, onHome }: { proj: Projection; fa: Fre
       <section className="wi-verdict panel" aria-labelledby="wi-name">
         <div className="wi-who">
           <div className="eyebrow">{p.role === "SP" ? t("sp") : t("rp")} · {p.throws === "Right" ? t("right") : t("left")}</div>
-          <h2 id="wi-name" className="num">{p.name}</h2>
+          <h2 id="wi-name"><PitcherName name={p.name} /></h2>
           <Link to={`/lanzador/${p.pitcher_id}`} className="small muted wi-profile">{t("profileLink")} →</Link>
         </div>
         <div className="wi-score">

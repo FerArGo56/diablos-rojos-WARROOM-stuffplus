@@ -7,6 +7,7 @@ import { fmt, signed, useApi, useAppState, useParkScale } from "../state";
 import { FA_RULES, signingFor, type ParkScale, type SignVerdict } from "../verdicts";
 import { Term } from "./Term";
 import { Verdict } from "./Verdict";
+import { PitcherName } from "./PitcherName";
 
 const PAGE = 50;
 const MAX = 500; // tope del API por consulta (backend: Query(50, le=500))
@@ -175,7 +176,7 @@ function FaRow({ r, compact, home }: { r: FreeAgentRow; compact: boolean; home: 
     <li className="fa-row">
       <div className="fa-verdict"><Verdict kind={s.verdict} note={s.smallSample && s.verdict !== "promising" ? t("smallSample") : undefined} /></div>
       <div className="fa-who">
-        <Link to={`/lanzador/${r.pitcher_id}`} className="fa-name num">{r.name}</Link>
+        <Link to={`/lanzador/${r.pitcher_id}`} className="fa-name"><PitcherName name={r.name} /></Link>
         <span className="fa-meta">
           {r.role === "SP" ? t("sp") : t("rp")} · {hand}
           {r.status === "FA" && <span className="chip gold">{t("freeAgent")}</span>}
