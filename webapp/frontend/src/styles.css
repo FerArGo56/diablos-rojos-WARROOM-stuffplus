@@ -555,3 +555,18 @@ table.data tbody th { text-transform: none; font-family: var(--body); font-size:
 /* tarjeta principal de cada pantalla: Hoy (marcador), ¿Y si…? (veredicto), Estadio (lanzador elegido),
    Lanzador (decisión en el Harp Helú) */
 .scorebug, .panel.wi-verdict, .panel.sel-pitcher, .panel.decision { border-color: var(--glow-border); box-shadow: var(--glow); }
+
+/* ------------------------------------------------------------ PWA: avisos */
+@media (display-mode: standalone) { .topbar { padding-top: max(8px, env(safe-area-inset-top)); } }
+.notice { display: flex; align-items: center; justify-content: center; gap: var(--sp-3); padding: 8px 16px; font-size: var(--fs-sm); text-align: center; border-bottom: 1px solid var(--line); }
+.notice.offline { background: #2a1a08; color: var(--gold); font-weight: 600; }
+.notice.install { background: var(--panel); color: var(--text); justify-content: space-between; text-align: left; }
+.notice.install .btn { flex: none; }
+.notice-close { flex: none; background: none; border: 0; color: var(--muted); width: var(--tap); height: var(--tap); border-radius: 50%; }
+.notice-close:hover { color: var(--text); background: var(--panel-2); }
+.ptr { height: 0; opacity: 0; overflow: hidden; display: flex; align-items: center; justify-content: center; font-size: var(--fs-sm); color: var(--muted); margin-bottom: calc(-1 * var(--sp-3)); }
+.stamp-refresh { margin-left: var(--sp-3); background: none; border: 0; padding: 4px 0; font: inherit; color: var(--muted); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+.stamp-refresh:hover { color: var(--text); }
+.stamp-refresh[disabled] { text-decoration: none; cursor: default; }
+/* área táctil de 44 px sin hacer más alta la línea: relleno + margen negativo */
+@media (pointer: coarse) { .stamp-refresh { padding: 14px 8px; margin-block: -14px; margin-right: -8px; } }

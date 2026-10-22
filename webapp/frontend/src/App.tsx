@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import { Navigate, NavLink, Route, Routes, useLocation } from "react-router-dom";
+import { InstallHint, OfflineBanner } from "./components/AppNotices";
 import { BottomNav } from "./components/BottomNav";
 import { Diablo } from "./components/Diablo";
 import { useLang } from "./i18n";
@@ -41,6 +42,8 @@ export default function App() {
         <MoreMenu />
       </header>
       {meta?.synthetic && <div className="banner">{t("syntheticBanner")}</div>}
+      <OfflineBanner />
+      <InstallHint />
       <div id="main" tabIndex={-1} className="route" key={pathname}>
         <Routes>
           <Route path="/" element={<TodayPage />} />
