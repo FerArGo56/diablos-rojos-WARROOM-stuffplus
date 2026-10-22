@@ -1,15 +1,47 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import type { FreeAgentRow, FreeAgents } from "../api";
-import { useLang } from "../i18n";
+import { api, type FreeAgentRow, type FreeAgents } from "../api";
+import { useLang, type Key } from "../i18n";
 import { pitchName, pitcherPhrase } from "../phrases";
 import { fmt, signed, useApi, useAppState } from "../state";
-import { FA_RULES, signingFor } from "../verdicts";
+import { FA_RULES, signingFor, type SignVerdict } from "../verdicts";
 import { Term } from "./Term";
 import { Verdict } from "./Verdict";
 
 const PAGE = 50;
-const MAX = 500; // tope del API
+const MAX = 500; // tope del API por consulta (backend: Query(50, le=500))
+const SHAPE: Record<SignVerdict, string> = { sign: "up", watch: "dot", no: "down" };
+
+type Filters = { status: string; role: "" | "SP" | "RP"; throws: "" | "Right" | "Left"; sort: "home" | "neutral" | "fit" };
+type FullList = { rows: FreeAgentRow[]; total: number; medians: Record<string, number | null>; missing: number };
+
+const SORT_KEY = { home: "stuff_home", neutral: "stuff_neutral", fit: "fit" } as const;
+
+/** La lista completa, para poder filtrar por veredicto (se calcula en el frontend).
+ *  Como el API entrega máximo 500 por consulta, se pide por rol × mano y se junta. */
+function useFullList(f: Filters | null) {
+  const [state, setState] = useState<{ data: FullList | null; error: boolean }>({ data: null, error: false });
+  const key = f ? JSON.stringify(f) : null;
+  useEffect(() => {
+    if (!f) return;
+    let alive = true;
+    setState({ data: null, error: false });
+    const roles = f.role ? [f.role] : ["SP", "RP"];
+    const hands = f.throws ? [f.throws] : ["Right", "Left"];
+    Promise.all(roles.flatMap((role) => hands.map((throws) =>
+      api<FreeAgents>("/free-agents", { status: f.status, role, throws, sort: f.sort, limit: MAX }))))
+      .then((parts) => {
+        const k = SORT_KEY[f.sort];
+        const rows = parts.flatMap((p) => p.rows).sort((a, b) => (b[k] ?? -Infinity) - (a[k] ?? -Infinity));
+        const total = parts.reduce((n, p) => n + p.total, 0);
+        if (alive) setState({ data: { rows, total, medians: parts[0]?.our_medians ?? {}, missing: total - rows.length }, error: false });
+      })
+      .catch(() => { if (alive) setState({ data: null, error: true }); });
+    return () => { alive = false; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [key]);
+  return state;
+}
 
 export function FreeAgentTable({ compact = false }: { compact?: boolean }) {
   const { t } = useLang();
@@ -20,11 +52,25 @@ export function FreeAgentTable({ compact = false }: { compact?: boolean }) {
   const [role, setRole] = useState<"" | "SP" | "RP">("");
   const [throws, setThrows] = useState<"" | "Right" | "Left">("");
   const [pickedSort, setSort] = useState<"home" | "neutral" | "fit">("home");
-  const [limit, setLimit] = useState(compact ? 6 : PAGE);
-  const { data, loading, error } = useApi<FreeAgents>("/free-agents", { status, role, throws, sort: pickedSort, limit });
-  const noStaff = !!data && Object.values(data.our_medians).every((v) => v == null);
+  const [verdict, setVerdict] = useState<"" | SignVerdict>("");
+  const [pages, setPages] = useState(1);
+
+  const small = useApi<FreeAgents>(compact ? "/free-agents" : null, { status, role, throws, sort: pickedSort, limit: 6 });
+  const full = useFullList(compact ? null : { status, role, throws, sort: pickedSort });
+  const medians = compact ? small.data?.our_medians : full.data?.medians;
+  const noStaff = !!medians && Object.values(medians).every((v) => v == null);
   const sort = noStaff && pickedSort === "fit" ? "home" : pickedSort;
-  const resetPage = () => setLimit(compact ? 6 : PAGE);
+  const error = compact ? small.error : full.error;
+
+  const all = useMemo(() => (compact ? small.data?.rows : full.data?.rows) ?? null, [compact, small.data, full.data]);
+  const counts = useMemo(() => {
+    const c: Record<SignVerdict, number> = { sign: 0, watch: 0, no: 0 };
+    for (const r of all ?? []) c[signingFor(r).verdict]++;
+    return c;
+  }, [all]);
+  const filtered = useMemo(() => (all && verdict ? all.filter((r) => signingFor(r).verdict === verdict) : all), [all, verdict]);
+  const shown = compact ? filtered : filtered?.slice(0, pages * PAGE);
+  const reset = () => setPages(1);
 
   return (
     <div className={`fa ${compact ? "panel fa-compact" : ""}`}>
@@ -37,24 +83,36 @@ export function FreeAgentTable({ compact = false }: { compact?: boolean }) {
           <Link to="/agentes-libres" className="btn" style={{ padding: "5px 10px", fontSize: 13 }}>{t("seeAll")} →</Link>
         </div>
       )}
+      {!compact && (
+        <div className="fa-verdicts" role="group" aria-label={t("verdictCol")}>
+          <button type="button" className={verdict === "" ? "on" : ""} aria-pressed={verdict === ""} onClick={() => { setVerdict(""); reset(); }}>
+            {t("faAll")} <span className="num">{all ? all.length : "…"}</span>
+          </button>
+          {(["sign", "watch", "no"] as const).map((v) => (
+            <button key={v} type="button" className={`v-${v} ${verdict === v ? "on" : ""}`} aria-pressed={verdict === v} onClick={() => { setVerdict(v); reset(); }}>
+              <span className={`v-shape ${SHAPE[v]}`} aria-hidden="true" />{t(`v_${v}` as Key)} <span className="num">{all ? counts[v] : "…"}</span>
+            </button>
+          ))}
+        </div>
+      )}
       <div className="fa-filters" role="group" aria-label={t("filters")}>
         {teamsKnown && (
           <div className="seg" role="group" aria-label={t("status")}>
             {(["fa", "signed", "all"] as const).map((s) => (
-              <button key={s} type="button" className={status === s ? "on" : ""} aria-pressed={status === s} onClick={() => { setStatus(s); resetPage(); }}>{s === "fa" ? t("faOnly") : s === "signed" ? t("faSigned") : t("faAll")}</button>
+              <button key={s} type="button" className={status === s ? "on" : ""} aria-pressed={status === s} onClick={() => { setStatus(s); reset(); }}>{s === "fa" ? t("faOnly") : s === "signed" ? t("faSigned") : t("faAll")}</button>
             ))}
           </div>
         )}
         <div className="seg" role="group" aria-label={t("role")}>
-          {(["", "SP", "RP"] as const).map((r) => <button key={r} type="button" className={role === r ? "on" : ""} aria-pressed={role === r} onClick={() => { setRole(r); resetPage(); }}>{r === "" ? t("any") : r === "SP" ? t("sp") : t("rp")}</button>)}
+          {(["", "SP", "RP"] as const).map((r) => <button key={r} type="button" className={role === r ? "on" : ""} aria-pressed={role === r} onClick={() => { setRole(r); reset(); }}>{r === "" ? t("any") : r === "SP" ? t("sp") : t("rp")}</button>)}
         </div>
         {!compact && (
           <>
             <div className="seg" role="group" aria-label={t("hand")}>
-              {(["", "Right", "Left"] as const).map((h) => <button key={h} type="button" className={throws === h ? "on" : ""} aria-pressed={throws === h} onClick={() => { setThrows(h); resetPage(); }}>{h === "" ? t("any") : h === "Right" ? t("right") : t("left")}</button>)}
+              {(["", "Right", "Left"] as const).map((h) => <button key={h} type="button" className={throws === h ? "on" : ""} aria-pressed={throws === h} onClick={() => { setThrows(h); reset(); }}>{h === "" ? t("any") : h === "Right" ? t("right") : t("left")}</button>)}
             </div>
             <label className="muted small fa-sort">{t("sortBy")}
-              <select className="sel" value={sort} onChange={(e) => { setSort(e.target.value as typeof pickedSort); resetPage(); }}>
+              <select className="sel" value={sort} onChange={(e) => { setSort(e.target.value as typeof pickedSort); reset(); }}>
                 <option value="home">{t("sortHome")}</option>
                 <option value="neutral">{t("sortNeutral")}</option>
                 {!noStaff && <option value="fit">{t("sortFit")}</option>}
@@ -63,7 +121,7 @@ export function FreeAgentTable({ compact = false }: { compact?: boolean }) {
           </>
         )}
       </div>
-      {!compact && data && (
+      {!compact && medians && (
         <p className="fa-rule">
           {noStaff
             ? t("faNoStaffNote", { a: FA_RULES.fallback.sign, b: FA_RULES.fallback.watch })
@@ -73,20 +131,23 @@ export function FreeAgentTable({ compact = false }: { compact?: boolean }) {
       )}
 
       {error && <p className="muted">{t("error")}</p>}
-      {!data && !error && <div className="skel skel-card" aria-busy="true" />}
-      {data && (
+      {!shown && !error && <div className="skel skel-card" aria-busy="true" />}
+      {shown && filtered && (
         <>
           <div className="fa-head" aria-hidden="true">
             <span>{t("verdictCol")}</span><span>{t("pitcher")}</span><span>{t("whyCol")}</span><span className="r">{t("stuffHome")}</span>{!compact && <span />}
           </div>
-          <ul className="fa-list">
-            {data.rows.map((r) => <FaRow key={r.pitcher_id} r={r} compact={compact} />)}
+          <ul className="fa-list" aria-live="polite">
+            {shown.map((r) => <FaRow key={r.pitcher_id} r={r} compact={compact} />)}
           </ul>
           {!compact && (
             <div className="fa-foot">
-              <span className="faint small">{t("showing", { n: data.rows.length, total: data.total })}</span>
-              {data.rows.length < Math.min(data.total, MAX) && (
-                <button type="button" className="btn" disabled={loading} onClick={() => setLimit((l) => Math.min(l + PAGE, MAX))}>{t("showMore")}</button>
+              <span className="faint small">
+                {t("showing", { n: shown.length, total: filtered.length })}
+                {full.data && full.data.missing > 0 && <> · {t("faMissing", { n: full.data.missing, max: MAX })}</>}
+              </span>
+              {shown.length < filtered.length && (
+                <button type="button" className="btn" onClick={() => setPages((n) => n + 1)}>{t("showMore")}</button>
               )}
             </div>
           )}
