@@ -11,16 +11,22 @@ Tiene dos piezas:
 
 ## Pantallas
 
-| Pantalla | Qué muestra |
-|---|---|
-| **Inicio** | Mapa de los 20 parques, buscador, calendario de los Diablos, recomendación de bullpen ("el diablo") y agentes libres |
-| **Parque** | Zona de strike vista desde el cátcher: dónde cae cada pitcheo a nivel del mar contra ese parque. También la gráfica de movimiento y el ranking de pitchers por Stuff+ en ese parque |
-| **Pitcher** | Arsenal, Stuff+ en los 20 parques, carga de trabajo y la P(whiff) de BayesBall a nivel del mar y en Harp Helú |
-| **Agentes libres** | Pitchers disponibles ordenados por Stuff+ |
-| **Metodología** | Estudio de altitud, métricas de validación de Stuff+ y BayesBall, y link al paper |
+## Pantallas
+
+| Pantalla | Ruta | Para quién | Qué muestra |
+|---|---|---|---|
+| **Explorar** (portada) | `/` | Todos | Mapa de los 20 parques, buscador, calendario de los Diablos y los mejores agentes libres |
+| **Hoy** | `/hoy` | Coach | El juego del día y la serie, el parque en una frase, los mejores lanzadores de la liga ahí y la recomendación de bullpen |
+| **Estadio** | `/estadio/:id` | Coach | Zona de strike vista desde el cátcher, gráfica de movimiento, modo 3D de las trayectorias reales y el ranking de lanzadores por Stuff+ en ese parque |
+| **Lanzador** | `/lanzador/:id` | Todos | Arsenal, Stuff+ en los 20 parques, dónde usarlo y dónde no, carga de trabajo y la P(whiff) de BayesBall a nivel del mar y en Harp Helú |
+| **Fichajes** | `/agentes-libres` | Reclutador | Agentes libres con veredicto (Fichar, Prometedor, Vigilar o No), comparados contra los de su mismo rol |
+| **¿Y si…?** | `/y-si` | Reclutador y coach | Cómo le iría a un lanzador real en cualquier parque |
+| **Metodología** | `/metodologia` | Jurado | Estudio de altitud, métricas de validación de Stuff+ y BayesBall, y link al paper |
+
+- Todas las pantallas tienen botón **ES / EN**.
+- El detalle del rediseño (decisiones, usuarios y fases) está en [`docs/BRIEF_REDISENO.md`](docs/BRIEF_REDISENO.md).
 
 Todas las pantallas tienen botón **ES / EN**.
-
 ## Correrla
 
 **Lo normal:** desde la raíz del repo, `bash apis/instalar.sh` (una vez) y `bash apis/iniciar_todo.sh`. Prende los dos APIs y esta app juntos. Ver [`apis/README.md`](../apis/README.md).
