@@ -1,7 +1,8 @@
-import { useMemo } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import type { Bullpen, Game, LeaderRow, Schedule, StadiumDetail } from "../api";
 import { BullpenList } from "../components/BullpenList";
+import { CountUp } from "../components/CountUp";
 import { Diablo } from "../components/Diablo";
 import { Term } from "../components/Term";
 import { Verdict } from "../components/Verdict";
@@ -27,10 +28,12 @@ export default function TodayPage() {
   const { t, lang } = useLang();
   const { meta, selectedDate, setSelectedDate } = useAppState();
   const { data: bp, error, retry } = useApi<Bullpen>("/bullpen", { on: selectedDate ?? undefined });
-  const { data: sched } = useApi<Schedule>("/schedule");
+  const { data: sched, retry: retrySched } = useApi<Schedule>("/schedule");
   const sid = bp?.available ? bp.stadium.id : null;
-  const { data: st } = useApi<StadiumDetail>(sid ? `/stadiums/${sid}` : null);
-  const { data: top } = useApi<{ rows: LeaderRow[] }>(sid ? `/stadiums/${sid}/leaderboard` : null, { limit: 3 });
+  const { data: st, retry: retrySt } = useApi<StadiumDetail>(sid ? `/stadiums/${sid}` : null);
+  const { data: top, retry: retryTop } = useApi<{ rows: LeaderRow[] }>(sid ? `/stadiums/${sid}/leaderboard` : null, { limit: 3 });
+  const refresh = useCallback(() => { retry(); retrySched(); retrySt(); retryTop(); }, [retry, retrySched, retrySt, retryTop]);
+  const { indicator, busy } = usePullToRefresh(refresh);
   const scale = useParkScale(sid);
 
   const date = bp?.games[0]?.date ?? bp?.as_of ?? null;
@@ -51,6 +54,7 @@ export default function TodayPage() {
 
   return (
     <main className="page today">
+      <div ref={indicator} className="ptr" aria-hidden="true" />
       <section className="scorebug" aria-labelledby="game-title">
         <div className="sb-meta">
           {label && <span className="sb-label">{t(label)}</span>}
@@ -65,11 +69,14 @@ export default function TodayPage() {
         <Link to={`/estadio/${bp.stadium.id}`} className="sb-park">
           <span className="sb-venue">{bp.stadium.venue_name}</span>
           <span className="sb-alt">
-            <span className="score" style={{ color: altitudeColor(alt) }}>{fmtInt(lang, alt)}<span className="sb-unit"> m</span></span>
+            <span className="score" style={{ color: altitudeColor(alt) }}><CountUp value={alt} format={(v) => fmtInt(lang, v)} /><span className="sb-unit"> m</span></span>
             <span className="sb-alt-l">{t("altitude")}</span>
           </span>
         </Link>
-        <p className="stamp">{t("dataAsOf", fmtDate(lang, bp.as_of, { day: "numeric", month: "short", year: "numeric" }))}</p>
+        <p className="stamp">
+          {t("dataAsOf", fmtDate(lang, bp.as_of, { day: "numeric", month: "short", year: "numeric" }))}
+          <button type="button" className="stamp-refresh" onClick={refresh} disabled={busy}>{busy ? t("refreshing") : t("refresh")}</button>
+        </p>
       </section>
 
       {series.length > 1 && (
@@ -115,7 +122,7 @@ export default function TodayPage() {
         <h2 id="bullpen-title" className="section-label">{t("yourBullpen")}</h2>
         {bp.relievers.length > 0 ? <BullpenList data={bp} scale={scale} /> : (
           <div className="empty-note">
-            <Diablo size={44} still />
+            <Diablo size={88} full />
             <p>{t("bullpenEmpty")}</p>
           </div>
         )}
@@ -128,7 +135,7 @@ function EmptyNote({ text, onRetry }: { text: string; onRetry?: () => void }) {
   const { t } = useLang();
   return (
     <div className="empty-note">
-      <Diablo size={44} still />
+      <Diablo size={88} full />
       <div>
         <p>{text}</p>
         {onRetry && <button type="button" className="btn" onClick={onRetry} style={{ marginRight: 8 }}>{t("retry")}</button>}
@@ -136,4 +143,46 @@ function EmptyNote({ text, onRetry }: { text: string; onRetry?: () => void }) {
       </div>
     </div>
   );
+}
+
+const PULL_TRIGGER = 70; // px
+
+/** Deslizar hacia abajo desde arriba de Hoy para recargar (en pantallas táctiles). El indicador se mueve
+ *  directo en el DOM durante el gesto; el botón "Actualizar" hace lo mismo sin gesto. */
+function usePullToRefresh(onRefresh: () => void) {
+  const { t } = useLang();
+  const indicator = useRef<HTMLDivElement>(null);
+  const [busy, setBusy] = useState(false);
+  useEffect(() => {
+    if (!window.matchMedia?.("(pointer: coarse)").matches) return;
+    let startY: number | null = null;
+    let dist = 0;
+    const paint = (d: number) => {
+      const el = indicator.current;
+      if (!el) return;
+      el.style.height = `${Math.min(d, 120) / 2}px`;
+      el.style.opacity = String(Math.min(1, d / PULL_TRIGGER));
+      el.textContent = d > PULL_TRIGGER ? t("pullRelease") : "";
+    };
+    const start = (e: TouchEvent) => { startY = window.scrollY <= 0 ? e.touches[0].clientY : null; dist = 0; };
+    const move = (e: TouchEvent) => { if (startY == null) return; dist = Math.max(0, e.touches[0].clientY - startY); paint(dist); };
+    const end = () => {
+      if (startY != null && dist > PULL_TRIGGER) {
+        setBusy(true);
+        onRefresh();
+        window.setTimeout(() => setBusy(false), 800);
+      }
+      startY = null;
+      paint(0);
+    };
+    window.addEventListener("touchstart", start, { passive: true });
+    window.addEventListener("touchmove", move, { passive: true });
+    window.addEventListener("touchend", end);
+    return () => {
+      window.removeEventListener("touchstart", start);
+      window.removeEventListener("touchmove", move);
+      window.removeEventListener("touchend", end);
+    };
+  }, [onRefresh, t]);
+  return { indicator, busy };
 }

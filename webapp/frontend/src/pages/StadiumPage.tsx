@@ -1,9 +1,11 @@
 import { useCallback, useEffect, useState } from "react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import type { LeaderRow, Projection, StadiumDetail } from "../api";
+import { CountUp } from "../components/CountUp";
 import { CrownIcon, Leaderboard } from "../components/Leaderboard";
 import { MovementPlot } from "../components/MovementPlot";
 import { SearchBox } from "../components/SearchBox";
+import { Pitch3D } from "../components/Pitch3D";
 import { StrikeZone } from "../components/StrikeZone";
 import { Term } from "../components/Term";
 import { Verdict } from "../components/Verdict";
@@ -20,6 +22,7 @@ export default function StadiumPage() {
   const pid = params.get("p");
   const [aim, setAim] = useState({ x: 0, z: 2.5 });
   const [crown, setCrown] = useState(false);
+  const [mode, setMode] = useState<"2d" | "3d">("2d");
   const { data: st, error, retry } = useApi<StadiumDetail>(`/stadiums/${id}`);
   const { data: top } = useApi<{ rows: LeaderRow[] }>(`/stadiums/${id}/leaderboard`, { limit: 3 });
   const { data: proj } = useApi<Projection>(pid ? `/stadiums/${id}/pitchers/${pid}` : null, { aim_x: aim.x, aim_z: aim.z });
@@ -51,8 +54,8 @@ export default function StadiumPage() {
           <h1>{st.venue_name}</h1>
           <p className="lede">{parkPhrase(t, lang, st)}</p>
           <div className="stats-row">
-            <div className="stat"><span className="v score" style={{ color: altitudeColor(st.altitude_m) }}>{fmtInt(lang, st.altitude_m)}<span className="sb-unit"> m</span></span><span className="l">{t("altitude")} · {st.city}</span></div>
-            <div className="stat"><span className="v score">{fmt(st.movement_retained_pct, 0)}<span className="sb-unit">%</span></span><span className="l">{t("movementRetained")} {t("vsSeaLevel")}</span></div>
+            <div className="stat"><span className="v score" style={{ color: altitudeColor(st.altitude_m) }}><CountUp value={st.altitude_m} format={(v) => fmtInt(lang, v)} /><span className="sb-unit"> m</span></span><span className="l">{t("altitude")} · {st.city}</span></div>
+            <div className="stat"><span className="v score"><CountUp value={st.movement_retained_pct} format={(v) => fmt(v, 0)} /><span className="sb-unit">%</span></span><span className="l">{t("movementRetained")} {t("vsSeaLevel")}</span></div>
           </div>
         </div>
         <button type="button" className="crown-btn" onClick={() => setCrown(true)}><CrownIcon size={26} /> {t("crownTitle")}</button>
@@ -111,8 +114,18 @@ export default function StadiumPage() {
 
           <div className="stadium-grid">
             <section className="panel zone-panel">
-              <div className="panel-head"><h3>{t("strikeZoneTitle")}</h3><span className="faint tiny">{t("aimHint")}</span></div>
-              <StrikeZone pitches={ready.pitches} visible={visible} aim={aim} onAim={(x, z) => setAim({ x, z })} labels={{ sea: t("seaLevel"), here: st.venue_name, aim: `${t("strikeZoneTitle")}. ${t("aimHint")}` }} />
+              <div className="panel-head">
+                <h3>{mode === "3d" ? t("traj3dTitle") : t("strikeZoneTitle")}</h3>
+                <div className="seg" role="group" aria-label={t("viewMode")}>
+                  {(["2d", "3d"] as const).map((m) => <button key={m} type="button" className={mode === m ? "on" : ""} aria-pressed={mode === m} onClick={() => setMode(m)}>{m === "2d" ? t("view2d") : t("view3d")}</button>)}
+                </div>
+              </div>
+              {mode === "3d"
+                ? <Pitch3D pitches={ready.pitches} visible={visible} labels={{ sea: t("seaLevel"), here: st.venue_name }} />
+                : <>
+                    <p className="faint tiny zone-hint">{t("aimHint")}</p>
+                    <StrikeZone pitches={ready.pitches} visible={visible} aim={aim} onAim={(x, z) => setAim({ x, z })} labels={{ sea: t("seaLevel"), here: st.venue_name, aim: `${t("strikeZoneTitle")}. ${t("aimHint")}` }} />
+                  </>}
             </section>
             <section className="panel">
               <div className="panel-head"><h3>{t("movementTitle")}</h3></div>
