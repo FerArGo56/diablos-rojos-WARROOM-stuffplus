@@ -1,0 +1,40 @@
+# ⚠️ El repo es PÚBLICO. Datos y llaves NUNCA se suben.
+# Datos — NO subir nunca (términos de la competencia)
+*.pkl
+*.npz
+resultados_api2/
+data/raw/
+data/processed/
+*.csv
+*.parquet
+*.feather
+
+# Modelos grandes y artefactos
+*.joblib
+*.onnx
+
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.ipynb_checkpoints/
+
+
+# OS / editores
+.DS_Store
+.vscode/
+.idea/
+
+
+# Llaves y archivos locales de los APIs y la web app
+.env
+logs/
+
+# Salidas de los notebooks (tablas sacadas de los datos de la competencia)
+resultados/
+
+# Modelos entrenados de Stuff+: se crean solos la primera vez (30-40 min)
+modelos/stuff_plus/entrenados/
