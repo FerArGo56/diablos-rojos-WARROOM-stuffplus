@@ -2,6 +2,7 @@ import { useEffect, useId, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { api, type SearchResult } from "../api";
 import { fmtInt, useLang } from "../i18n";
+import { PitcherName } from "./PitcherName";
 
 type Props = { pitchersOnly?: boolean; onPickPitcher?: (id: string) => void; placeholder?: string; autoFocus?: boolean };
 
@@ -63,7 +64,7 @@ export function SearchBox({ pitchersOnly, onPickPitcher, placeholder, autoFocus 
           {res.pitchers.length > 0 && <div className="grp" role="presentation">{t("searchPitchers")}</div>}
           {res.pitchers.map((p, i) => (
             <button key={p.pitcher_id} type="button" id={`${listId}-${i}`} role="option" aria-selected={active === i} tabIndex={-1} className={`item ${active === i ? "active" : ""}`} onClick={() => pick("p", p.pitcher_id)}>
-              <span className="num">{p.name}</span>
+              <PitcherName name={p.name} />
               <span className="chip">{p.role === "SP" ? t("sp") : t("rp")} · {p.throws === "Right" ? "R" : "L"}</span>
               <span className={`chip ${p.status === "FA" ? "gold" : ""}`} style={{ marginLeft: "auto" }}>{statusLabel(p.status)}</span>
             </button>

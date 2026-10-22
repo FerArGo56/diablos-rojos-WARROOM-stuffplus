@@ -6,6 +6,7 @@ import { fmt } from "../state";
 import { verdictFor, type ParkScale } from "../verdicts";
 import { Term } from "./Term";
 import { Verdict } from "./Verdict";
+import { PitcherName } from "./PitcherName";
 
 const SLOT_ORDER = ["closer", "setup", "middle", "long", "depth"] as const;
 
@@ -40,7 +41,7 @@ function RelieverCard({ r, slot, scale }: { r: Reliever; slot: string; scale: Pa
   return (
     <div className={`rp-card ${slot === "closer" ? "closer" : ""}`} style={slot === "rest" ? { opacity: 0.7 } : undefined}>
       <div>
-        <Link to={`/lanzador/${r.pitcher_id}`} className="num" style={{ fontWeight: 600 }}>{r.name}</Link>{" "}
+        <Link to={`/lanzador/${r.pitcher_id}`} ><PitcherName name={r.name} /></Link>{" "}
         <span className="chip">{r.throws === "Right" ? "R" : "L"}HP</span>{" "}
         {r.status === "limited" && <span className="chip gold">{t("limited")}</span>}
       </div>

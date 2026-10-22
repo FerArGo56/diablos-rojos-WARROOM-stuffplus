@@ -7,6 +7,7 @@ import { PITCH_NAMES, fmtDate, fmtInt, useLang } from "../i18n";
 import { PARK_SPREAD_MIN, pitchPhrase } from "../phrases";
 import { PITCH_COLORS, altitudeColor, fmt, useApi, useAppState, useParkScale } from "../state";
 import { verdictFor } from "../verdicts";
+import { PitcherName } from "../components/PitcherName";
 
 export default function PitcherPage() {
   const { id = "" } = useParams();
@@ -34,11 +35,11 @@ export default function PitcherPage() {
 
   return (
     <main className="page pitcher">
-      <Link to="/explorar" className="muted small back-link">← {t("backToMap")}</Link>
+      <Link to="/" className="muted small back-link">← {t("backToMap")}</Link>
       <section className="pitcher-hero">
         <div>
           <div className="eyebrow">{p.role === "SP" ? t("sp") : t("rp")} · {p.throws === "Right" ? t("right") : t("left")}</div>
-          <h1 className="num">{p.name}</h1>
+          <h1><PitcherName name={p.name} /></h1>
           <div className="pitcher-chips">
             {p.status === "FA" ? <span className="chip gold">{t("freeAgent")}</span> : p.status === "?" ? null : <span className={`chip ${ours ? "red" : ""}`}>{ours ? t("ours") : `${t("onTeam")} ${p.status}`}</span>}
             {p.team_name && <span className="chip">{p.season}: {p.team_name}</span>}

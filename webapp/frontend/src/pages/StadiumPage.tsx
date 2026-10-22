@@ -13,6 +13,7 @@ import { PITCH_NAMES, fmtInt, useLang } from "../i18n";
 import { leaguePitchEffect, parkPhrase, pitchPhrase, pitcherPhrase, vsSea } from "../phrases";
 import { PITCH_COLORS, altitudeColor, fmt, signed, useApi, useAppState, useParkScale } from "../state";
 import { verdictFor } from "../verdicts";
+import { PitcherName } from "../components/PitcherName";
 
 export default function StadiumPage() {
   const { id = "" } = useParams();
@@ -47,7 +48,7 @@ export default function StadiumPage() {
 
   return (
     <main className="page stadium">
-      <Link to="/explorar" className="muted small back-link">← {t("backToMap")}</Link>
+      <Link to="/" className="muted small back-link">← {t("backToMap")}</Link>
       <section className="stadium-hero">
         <div>
           <div className="eyebrow">{st.team_name} · {st.zone === "Norte" ? t("zoneNorte") : t("zoneSur")}</div>
@@ -69,7 +70,7 @@ export default function StadiumPage() {
             {top.rows.map((r) => (
               <button key={r.pitcher_id} type="button" className={`best-card ${pid === r.pitcher_id ? "on" : ""}`} aria-pressed={pid === r.pitcher_id} onClick={() => pickPitcher(r.pitcher_id)}>
                 <span className="best-top"><span className="pick-rank num">{r.rank}</span><Verdict kind={verdictFor(r.stuff_plus, scale)} size="sm" /><span className="num faint">{fmt(r.stuff_plus)}</span></span>
-                <span className="best-name num">{r.name}</span>
+                <PitcherName name={r.name} className="best-name" />
                 <span className="best-why">{pitcherPhrase(t, lang, r, where)}</span>
               </button>
             ))}
@@ -84,7 +85,7 @@ export default function StadiumPage() {
           <section className="panel sel-pitcher" aria-labelledby="sel-name">
             <div>
               <div className="eyebrow">{p.role === "SP" ? t("sp") : t("rp")} · {p.throws === "Right" ? t("right") : t("left")}</div>
-              <h2 id="sel-name" className="num">{p.name}</h2>
+              <h2 id="sel-name"><PitcherName name={p.name} /></h2>
               <Link to={`/lanzador/${pid}`} className="muted small wi-profile">{t("profileLink")} →</Link>
             </div>
             <div className="wi-score">

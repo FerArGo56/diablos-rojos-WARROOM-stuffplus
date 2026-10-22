@@ -6,10 +6,10 @@ export function BottomNav() {
   const { t } = useLang();
   return (
     <nav className="bottomnav" aria-label={t("mainNav")}>
-      <NavLink to="/" end>{t("navToday")}</NavLink>
+      <NavLink to="/" end>{t("navExplore")}</NavLink>
+      <NavLink to="/hoy">{t("navToday")}</NavLink>
       <NavLink to="/agentes-libres">{t("navFreeAgents")}</NavLink>
       <NavLink to="/y-si">{t("navWhatIf")}</NavLink>
-      <NavLink to="/explorar">{t("navExplore")}</NavLink>
     </nav>
   );
 }

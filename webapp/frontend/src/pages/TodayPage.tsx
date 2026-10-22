@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import type { Bullpen, Game, LeaderRow, Schedule, StadiumDetail } from "../api";
 import { BullpenList } from "../components/BullpenList";
 import { CountUp } from "../components/CountUp";
@@ -10,6 +10,7 @@ import { fmtDate, fmtInt, useLang, type Key } from "../i18n";
 import { parkPhrase, pitcherPhrase } from "../phrases";
 import { altitudeColor, fmt, useApi, useAppState, useParkScale } from "../state";
 import { verdictFor } from "../verdicts";
+import { PitcherName } from "../components/PitcherName";
 
 const localToday = () => new Date().toLocaleDateString("en-CA"); // YYYY-MM-DD en la zona del usuario
 
@@ -40,6 +41,14 @@ export default function TodayPage() {
   const games = sched?.games ?? [];
   const series = useMemo(() => (date ? seriesOf(games, date) : []), [games, date]);
   const played = games.find((g) => g.date === date && g.result);
+  // llegar desde el diablito ("/hoy#bullpen"): bajar a la sección del bullpen cuando ya está pintada
+  const { hash } = useLocation();
+  const ready = !!bp && !!date;
+  useEffect(() => {
+    if (hash !== "#bullpen" || !ready) return;
+    const id = requestAnimationFrame(() => document.getElementById("bullpen")?.scrollIntoView({ block: "start" }));
+    return () => cancelAnimationFrame(id);
+  }, [hash, ready]);
 
   if (error) return <main className="page today"><EmptyNote text={t("error")} onRetry={retry} /></main>;
   if (bp && !bp.available) return <main className="page today"><EmptyNote text={t("noSchedule")} /></main>;
@@ -105,7 +114,7 @@ export default function TodayPage() {
                   <span className="pick-rank num" aria-hidden="true">{r.rank}</span>
                   <span className="pick-body">
                     <span className="pick-head">
-                      <span className="pick-name num">{r.name}</span>
+                      <PitcherName name={r.name} className="pick-name" />
                       <Verdict kind={verdictFor(r.stuff_plus, scale)} />
                     </span>
                     <span className="pick-why">{pitcherPhrase(t, lang, r, sid === meta?.home_stadium_id ? "home" : "here")}</span>
@@ -118,7 +127,7 @@ export default function TodayPage() {
         ) : <div className="skel skel-card" />}
       </section>
 
-      <section aria-labelledby="bullpen-title" className="today-bullpen">
+      <section id="bullpen" aria-labelledby="bullpen-title" className="today-bullpen">
         <h2 id="bullpen-title" className="section-label">{t("yourBullpen")}</h2>
         {bp.relievers.length > 0 ? <BullpenList data={bp} scale={scale} /> : (
           <div className="empty-note">
@@ -139,7 +148,7 @@ function EmptyNote({ text, onRetry }: { text: string; onRetry?: () => void }) {
       <div>
         <p>{text}</p>
         {onRetry && <button type="button" className="btn" onClick={onRetry} style={{ marginRight: 8 }}>{t("retry")}</button>}
-        <Link to="/explorar" className="btn">{t("goExplore")}</Link>
+        <Link to="/" className="btn">{t("goExplore")}</Link>
       </div>
     </div>
   );
