@@ -19,6 +19,8 @@ falla() { printf "\n✗ %b\n" "$1"; exit 1; }
 curl -s -o /dev/null http://localhost:8001/salud || falla "El API 2 está apagado. En otra Terminal: bash apis/iniciar_todo.sh"
 mkdir -p "$LOGS"
 
+curl -s -o /dev/null http://localhost:8000/salud || falla "El API 1 está apagado. En otra Terminal: bash apis/iniciar_todo.sh"
+
 echo "== Librerías de los notebooks"
 "$PY" -m pip install -q -r "$REPO/modelos/requirements.txt"
 "$PY" -c 'import xgboost' 2>/dev/null \
