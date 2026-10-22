@@ -3,8 +3,8 @@ import { Link } from "react-router-dom";
 import { api, type FreeAgentRow, type FreeAgents } from "../api";
 import { useLang, type Key } from "../i18n";
 import { pitchName, pitcherPhrase } from "../phrases";
-import { fmt, signed, useApi, useAppState } from "../state";
-import { FA_RULES, signingFor, type SignVerdict } from "../verdicts";
+import { fmt, signed, useApi, useAppState, useParkScale } from "../state";
+import { FA_RULES, signingFor, type ParkScale, type SignVerdict } from "../verdicts";
 import { Term } from "./Term";
 import { Verdict } from "./Verdict";
 
@@ -54,6 +54,7 @@ export function FreeAgentTable({ compact = false }: { compact?: boolean }) {
   const [throws, setThrows] = useState<"" | "Right" | "Left">("");
   const [pickedSort, setSort] = useState<"home" | "neutral" | "fit">("home");
   const [verdict, setVerdict] = useState<"" | SignVerdict>("");
+  const home = useParkScale(meta?.home_stadium_id ?? "harp-helu");
   const [pages, setPages] = useState(1);
 
   const small = useApi<FreeAgents>(compact ? "/free-agents" : null, { status, role, throws, sort: pickedSort, limit: 6 });
@@ -64,13 +65,13 @@ export function FreeAgentTable({ compact = false }: { compact?: boolean }) {
   const error = compact ? small.error : full.error;
   const retry = compact ? small.retry : full.retry;
 
-  const all = useMemo(() => (compact ? small.data?.rows : full.data?.rows) ?? null, [compact, small.data, full.data]);
+  const all = useMemo(() => (home ? (compact ? small.data?.rows : full.data?.rows) ?? null : null), [home, compact, small.data, full.data]);
   const counts = useMemo(() => {
     const c: Record<SignVerdict, number> = { sign: 0, watch: 0, no: 0 };
-    for (const r of all ?? []) c[signingFor(r).verdict]++;
+    if (home) for (const r of all ?? []) c[signingFor(r, home).verdict]++;
     return c;
-  }, [all]);
-  const filtered = useMemo(() => (all && verdict ? all.filter((r) => signingFor(r).verdict === verdict) : all), [all, verdict]);
+  }, [all, home]);
+  const filtered = useMemo(() => (all && home && verdict ? all.filter((r) => signingFor(r, home).verdict === verdict) : all), [all, home, verdict]);
   const shown = compact ? filtered : filtered?.slice(0, pages * PAGE);
   const reset = () => setPages(1);
 
@@ -126,8 +127,8 @@ export function FreeAgentTable({ compact = false }: { compact?: boolean }) {
       {!compact && medians && (
         <p className="fa-rule">
           {noStaff
-            ? t("faNoStaffNote", { a: FA_RULES.fallback.sign, b: FA_RULES.fallback.watch })
-            : t("faRuleNote", { a: `+${FA_RULES.fitSign}`, b: FA_RULES.homeSign })}{" "}
+            ? t("faNoStaffNote", { n: FA_RULES.minPitches })
+            : t("faRuleNote", { a: `+${FA_RULES.fitSign}` })}{" "}
           <Term k="stuff">{t("whatIsStuff")}</Term>
         </p>
       )}
@@ -140,7 +141,7 @@ export function FreeAgentTable({ compact = false }: { compact?: boolean }) {
             <span>{t("verdictCol")}</span><span>{t("pitcher")}</span><span>{t("whyCol")}</span><span className="r">{t("stuffHome")}</span>{!compact && <span />}
           </div>
           <ul className="fa-list" aria-live="polite">
-            {shown.map((r) => <FaRow key={r.pitcher_id} r={r} compact={compact} />)}
+            {home && shown.map((r) => <FaRow key={r.pitcher_id} r={r} compact={compact} home={home} />)}
           </ul>
           {!compact && (
             <div className="fa-foot">
@@ -159,9 +160,9 @@ export function FreeAgentTable({ compact = false }: { compact?: boolean }) {
   );
 }
 
-function FaRow({ r, compact }: { r: FreeAgentRow; compact: boolean }) {
+function FaRow({ r, compact, home }: { r: FreeAgentRow; compact: boolean; home: ParkScale }) {
   const { t, lang } = useLang();
-  const s = signingFor(r);
+  const s = signingFor(r, home);
   const hand = r.throws === "Right" ? t("right") : t("left");
   return (
     <li className="fa-row">

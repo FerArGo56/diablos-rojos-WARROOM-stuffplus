@@ -9,7 +9,7 @@ import { Term } from "../components/Term";
 import { Verdict } from "../components/Verdict";
 import { PITCH_NAMES, fmtInt, useLang } from "../i18n";
 import { leaguePitchEffect, parkPhrase, pitchPhrase, pitcherPhrase } from "../phrases";
-import { PITCH_COLORS, altitudeColor, fmt, signed, useApi, useAppState } from "../state";
+import { PITCH_COLORS, altitudeColor, fmt, signed, useApi, useAppState, useParkScale } from "../state";
 import { verdictFor } from "../verdicts";
 
 export default function StadiumPage() {
@@ -23,6 +23,7 @@ export default function StadiumPage() {
   const { data: st, error, retry } = useApi<StadiumDetail>(`/stadiums/${id}`);
   const { data: top } = useApi<{ rows: LeaderRow[] }>(`/stadiums/${id}/leaderboard`, { limit: 3 });
   const { data: proj } = useApi<Projection>(pid ? `/stadiums/${id}/pitchers/${pid}` : null, { aim_x: aim.x, aim_z: aim.z });
+  const scale = useParkScale(id);
   const [visible, setVisible] = useState<Set<string>>(new Set());
   const projPid = proj?.pitcher.pitcher_id;
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -59,11 +60,12 @@ export default function StadiumPage() {
 
       <section aria-labelledby="best-here">
         <h2 id="best-here" className="section-label">{t("bestHereShort")}</h2>
+        <p className="muted small hint"><Term k="verdict">{t("whatIsVerdict")}</Term></p>
         {top ? (
           <div className="best-pick" role="group" aria-labelledby="best-here">
             {top.rows.map((r) => (
               <button key={r.pitcher_id} type="button" className={`best-card ${pid === r.pitcher_id ? "on" : ""}`} aria-pressed={pid === r.pitcher_id} onClick={() => pickPitcher(r.pitcher_id)}>
-                <span className="best-top"><span className="pick-rank num">{r.rank}</span><Verdict kind={verdictFor(r.stuff_plus)} size="sm" /><span className="num faint">{fmt(r.stuff_plus)}</span></span>
+                <span className="best-top"><span className="pick-rank num">{r.rank}</span><Verdict kind={verdictFor(r.stuff_plus, scale)} size="sm" /><span className="num faint">{fmt(r.stuff_plus)}</span></span>
                 <span className="best-name num">{r.name}</span>
                 <span className="best-why">{pitcherPhrase(t, lang, r, where)}</span>
               </button>
@@ -83,7 +85,7 @@ export default function StadiumPage() {
               <Link to={`/lanzador/${pid}`} className="muted small wi-profile">{t("profileLink")} →</Link>
             </div>
             <div className="wi-score">
-              <Verdict kind={verdictFor(p.stuff_here)} size="lg" />
+              <Verdict kind={verdictFor(p.stuff_here, scale)} size="lg" />
               <p className="wi-line"><span className="num">{fmt(p.stuff_here)}</span> <Term k="stuff">Stuff+</Term> {t("here")}
                 {p.stuff_here != null && p.stuff_sea != null && <> · <span className="num">{t("vsSeaShort", { d: signed(p.stuff_here - p.stuff_sea) })}</span></>}</p>
             </div>

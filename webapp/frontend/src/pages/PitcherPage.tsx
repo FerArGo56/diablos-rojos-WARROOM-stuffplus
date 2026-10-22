@@ -5,7 +5,7 @@ import { Term } from "../components/Term";
 import { Verdict } from "../components/Verdict";
 import { PITCH_NAMES, fmtDate, fmtInt, useLang } from "../i18n";
 import { PARK_SPREAD_MIN, pitchPhrase } from "../phrases";
-import { PITCH_COLORS, altitudeColor, fmt, stuffColor, useApi, useAppState } from "../state";
+import { PITCH_COLORS, altitudeColor, fmt, useApi, useAppState, useParkScale } from "../state";
 import { verdictFor } from "../verdicts";
 
 export default function PitcherPage() {
@@ -19,6 +19,7 @@ export default function PitcherPage() {
   const { data, error, retry } = useApi<Profile>(`/pitchers/${id}`, { season });
   const { data: stadiums } = useApi<Stadium[]>("/stadiums");
   const { data: atHome } = useApi<Projection>(`/stadiums/${home}/pitchers/${id}`);
+  const homeScale = useParkScale(home);
 
   if (error) return <main className="page"><div className="empty-note"><p>{t("error")}</p><button type="button" className="btn" onClick={retry}>{t("retry")}</button></div></main>;
   if (!data) return <main className="page" aria-busy="true"><div className="skel skel-bug" /><div className="skel skel-card" /></main>;
@@ -58,8 +59,8 @@ export default function PitcherPage() {
 
         <aside className="decision panel" aria-label={t("atHome")}>
           <div className="small muted">{t("atHome")}</div>
-          <Verdict kind={verdictFor(homeStuff)} size="lg" />
-          <div className="small muted"><span className="num">{fmt(homeStuff)}</span> <Term k="stuff">Stuff+</Term></div>
+          <Verdict kind={verdictFor(homeStuff, homeScale)} size="lg" />
+          <div className="small muted"><span className="num">{fmt(homeStuff)}</span> <Term k="stuff">Stuff+</Term> · <Term k="verdict">{t("whatIsVerdict")}</Term></div>
           {ranked.length >= 6 && ranked[0].stuff_plus - ranked[ranked.length - 1].stuff_plus < PARK_SPREAD_MIN && (
             <p className="small use-avoid-same">{t("parksSimilar", { n: ranked.length, a: fmt(ranked[ranked.length - 1].stuff_plus), b: fmt(ranked[0].stuff_plus) })}</p>
           )}
@@ -136,7 +137,7 @@ export default function PitcherPage() {
                   <span className="dot" style={{ background: altitudeColor(b.altitude_m), marginRight: 6 }} />{b.team_code} <span className="faint num">{fmtInt(lang, b.altitude_m)} m</span>
                 </span>
                 <div className="bar-track">
-                  <div className="bar-fill" style={{ left: `${Math.min(50, xv)}%`, width: `${Math.abs(xv - 50)}%`, background: stuffColor(b.stuff_plus), opacity: 0.85 }} />
+                  <div className="bar-fill" style={{ left: `${Math.min(50, xv)}%`, width: `${Math.abs(xv - 50)}%`, background: b.stuff_plus >= center ? "var(--v-good)" : "var(--v-avoid)", opacity: 0.85 }} />
                   <div className="bar-mid" style={{ left: "50%" }} />
                 </div>
                 <span className="num" style={{ textAlign: "right" }}>{fmt(b.stuff_plus)}</span>

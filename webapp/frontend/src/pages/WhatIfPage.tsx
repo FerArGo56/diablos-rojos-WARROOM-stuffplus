@@ -7,8 +7,8 @@ import { Term } from "../components/Term";
 import { Verdict } from "../components/Verdict";
 import { fmtInt, useLang } from "../i18n";
 import { pitchName, pitchPhrase } from "../phrases";
-import { PITCH_COLORS, fmt, signed, useApi, useAppState } from "../state";
-import { verdictFor } from "../verdicts";
+import { PITCH_COLORS, fmt, signed, useApi, useAppState, useParkScale } from "../state";
+import { verdictFor, type ParkScale } from "../verdicts";
 
 /** ¿Y si…? modo 1: un lanzador real en cualquier parque, con los endpoints que ya existen. */
 export default function WhatIfPage() {
@@ -29,6 +29,7 @@ export default function WhatIfPage() {
   const { data: proj, error, retry } = useApi<Projection>(pid ? `/stadiums/${sid}/pitchers/${pid}` : null);
   const { data: top } = useApi<{ rows: LeaderRow[] }>(pid ? null : `/stadiums/${sid}/leaderboard`, { limit: 3 });
   const { data: fa } = useApi<FreeAgents>(pid ? "/free-agents" : null, { limit: 1 });
+  const scale = useParkScale(sid);
   const parks = stadiums ? [...stadiums].sort((a, b) => b.altitude_m - a.altitude_m) : [];
   const ready = proj && proj.pitcher.pitcher_id === pid && proj.stadium.id === sid ? proj : null;
 
@@ -54,7 +55,7 @@ export default function WhatIfPage() {
             <div className="wi-quick">
               {top.rows.map((r) => (
                 <button key={r.pitcher_id} type="button" className="btn" onClick={() => update({ p: r.pitcher_id })}>
-                  <span className="num">{r.name}</span> <Verdict kind={verdictFor(r.stuff_plus)} size="sm" />
+                  <span className="num">{r.name}</span> <Verdict kind={verdictFor(r.stuff_plus, scale)} size="sm" />
                 </button>
               ))}
             </div>
@@ -64,12 +65,12 @@ export default function WhatIfPage() {
 
       {pid && error && <div className="empty-note"><p>{t("error")}</p><button type="button" className="btn" onClick={retry}>{t("retry")}</button></div>}
       {pid && !error && !ready && <div className="skel skel-card" aria-busy="true" />}
-      {ready && <Result proj={ready} fa={fa} isHome={sid === home} onHome={() => update({ s: home }, true)} />}
+      {ready && <Result proj={ready} fa={fa} scale={scale} isHome={sid === home} onHome={() => update({ s: home }, true)} />}
     </main>
   );
 }
 
-function Result({ proj, fa, isHome, onHome }: { proj: Projection; fa: FreeAgents | null; isHome: boolean; onHome: () => void }) {
+function Result({ proj, fa, scale, isHome, onHome }: { proj: Projection; fa: FreeAgents | null; scale: ParkScale | null; isHome: boolean; onHome: () => void }) {
   const { t, lang } = useLang();
   const p = proj.pitcher;
   const here = p.stuff_here ?? null;
@@ -88,12 +89,12 @@ function Result({ proj, fa, isHome, onHome }: { proj: Projection; fa: FreeAgents
           <Link to={`/lanzador/${p.pitcher_id}`} className="small muted wi-profile">{t("profileLink")} →</Link>
         </div>
         <div className="wi-score">
-          <Verdict kind={verdictFor(here)} size="lg" />
+          <Verdict kind={verdictFor(here, scale)} size="lg" />
           <p className="wi-line">
             {t("wiStuffLine", { n: fmt(here), park: proj.stadium.venue_name })}
             {here != null && sea != null && <> · <span className="num">{t("wiVsSea", { d: signed(here - sea) })}</span></>}
           </p>
-          <p className="faint small"><Term k="stuff">{t("whatIsStuff")}</Term></p>
+          <p className="faint small"><Term k="stuff">{t("whatIsStuff")}</Term> · <Term k="verdict">{t("whatIsVerdict")}</Term></p>
         </div>
       </section>
 

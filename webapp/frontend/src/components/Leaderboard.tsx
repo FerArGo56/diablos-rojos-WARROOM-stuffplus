@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import type { LeaderRow } from "../api";
 import { PITCH_NAMES, useLang } from "../i18n";
 import { Term } from "./Term";
-import { PITCH_COLORS, fmt, signed, stuffColor, useApi, useAppState } from "../state";
+import { PITCH_COLORS, fmt, signed, stuffColor, useApi, useAppState, useParkScale } from "../state";
 
 type Board = { stadium_id: string; season: number; min_pitches: number; total: number; rows: LeaderRow[] };
 
@@ -24,6 +24,7 @@ export function Leaderboard({ stadiumId, venueName, onPick, onClose }: { stadium
   const { data } = useApi<Board>(`/stadiums/${stadiumId}/leaderboard`, { role, limit: 100 });
   const ourTeam = useAppState().meta?.our_team_code ?? "MEX";
   const closeRef = useRef<HTMLButtonElement>(null);
+  const scale = useParkScale(stadiumId);
   // Escape cierra; al abrir el foco va a "Cerrar" y al cerrar regresa a donde estaba.
   useEffect(() => {
     const prev = document.activeElement as HTMLElement | null;
@@ -63,7 +64,7 @@ export function Leaderboard({ stadiumId, venueName, onPick, onClose }: { stadium
                   <td><Link to={`/lanzador/${r.pitcher_id}`} className="num" style={{ fontWeight: 600 }} onClick={(e) => e.stopPropagation()}>{r.name}</Link> <span className="faint small">{r.throws === "Right" ? "R" : "L"} · {r.role}</span></td>
                   <td>{r.status === "FA" ? <span className="chip gold">{t("freeAgent")}</span> : <span className={`chip ${r.status === ourTeam ? "red" : ""}`}>{r.status}</span>}</td>
                   <td>{r.best_pitch && <span style={{ display: "inline-flex", gap: 6, alignItems: "center" }}><span className="dot" style={{ background: PITCH_COLORS[r.best_pitch] }} />{PITCH_NAMES[lang][r.best_pitch]}</span>}</td>
-                  <td className="r num" style={{ color: stuffColor(r.stuff_plus), fontWeight: 700 }}>{fmt(r.stuff_plus)}</td>
+                  <td className="r num" style={{ color: stuffColor(r.stuff_plus, scale), fontWeight: 700 }}>{fmt(r.stuff_plus)}</td>
                   <td className="r num muted">{fmt(r.stuff_neutral)}</td>
                   <td className="r num" style={{ color: r.altitude_delta >= 0 ? "var(--good)" : "var(--bad)" }}>{signed(r.altitude_delta)}</td>
                 </tr>

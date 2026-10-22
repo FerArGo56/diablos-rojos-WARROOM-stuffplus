@@ -1,7 +1,7 @@
 import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 import { useLang } from "../i18n";
 
-const GLOSSARY = { stuff: "g_stuff", ivb: "g_ivb", hb: "g_hb", whiff: "g_whiff", fit: "g_fit" } as const;
+const GLOSSARY = { stuff: "g_stuff", ivb: "g_ivb", hb: "g_hb", whiff: "g_whiff", fit: "g_fit", verdict: "g_verdict" } as const;
 
 /** Término técnico con su explicación en lenguaje simple. Abre con hover, foco o toque; cierra con Escape. */
 export function Term({ k, children }: { k: keyof typeof GLOSSARY; children: ReactNode }) {

@@ -1,6 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from "react";
 import { api, type Meta } from "./api";
-import { VERDICT_COLOR, verdictFor } from "./verdicts";
+import { VERDICT_COLOR, scaleFrom, verdictFor, type ParkScale } from "./verdicts";
 
 export const PITCH_COLORS: Record<string, string> = {
   "Four-Seam": "#ff4d5e", Sinker: "#ff9f43", Cutter: "#c08a6a", Slider: "#ffd23f",
@@ -21,10 +21,32 @@ export function altitudeColor(alt: number): string {
   return `rgb(${c[0]},${c[1]},${c[2]})`;
 }
 
-/** Color de un Stuff+ suelto, con los mismos umbrales que el veredicto (src/verdicts.ts). */
-export function stuffColor(v: number | null | undefined): string {
-  const k = verdictFor(v);
+/** Color de un Stuff+ suelto, con la misma escala del parque que el veredicto (src/verdicts.ts). */
+export function stuffColor(v: number | null | undefined, scale: ParkScale | null | undefined): string {
+  const k = verdictFor(v, scale);
   return k ? VERDICT_COLOR[k] : "var(--muted)";
+}
+
+// Una sola llamada al ranking por parque, compartida por todas las pantallas.
+const scaleCache = new Map<string, Promise<ParkScale | null>>();
+type Board = { rows: { stuff_plus: number }[] };
+
+/** Escala de veredictos del parque: percentiles del Stuff+ de toda la liga proyectada ahí. */
+export function useParkScale(stadiumId: string | null | undefined): ParkScale | null {
+  const [scale, setScale] = useState<ParkScale | null>(null);
+  useEffect(() => {
+    if (!stadiumId) { setScale(null); return; }
+    let alive = true;
+    let p = scaleCache.get(stadiumId);
+    if (!p) {
+      p = api<Board>(`/stadiums/${stadiumId}/leaderboard`, { limit: 500 }).then((b) => scaleFrom(b.rows.map((r) => r.stuff_plus)));
+      p.catch(() => scaleCache.delete(stadiumId));
+      scaleCache.set(stadiumId, p);
+    }
+    p.then((s) => { if (alive) setScale(s); }).catch(() => { if (alive) setScale(null); });
+    return () => { alive = false; };
+  }, [stadiumId]);
+  return scale;
 }
 
 export const fmt = (v: number | null | undefined, d = 1) => (v == null ? "–" : v.toFixed(d));
