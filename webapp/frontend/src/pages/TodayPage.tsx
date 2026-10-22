@@ -7,7 +7,7 @@ import { Term } from "../components/Term";
 import { Verdict } from "../components/Verdict";
 import { fmtDate, fmtInt, useLang, type Key } from "../i18n";
 import { parkPhrase, pitcherPhrase } from "../phrases";
-import { altitudeColor, fmt, useApi, useAppState } from "../state";
+import { altitudeColor, fmt, useApi, useAppState, useParkScale } from "../state";
 import { verdictFor } from "../verdicts";
 
 const localToday = () => new Date().toLocaleDateString("en-CA"); // YYYY-MM-DD en la zona del usuario
@@ -31,6 +31,7 @@ export default function TodayPage() {
   const sid = bp?.available ? bp.stadium.id : null;
   const { data: st } = useApi<StadiumDetail>(sid ? `/stadiums/${sid}` : null);
   const { data: top } = useApi<{ rows: LeaderRow[] }>(sid ? `/stadiums/${sid}/leaderboard` : null, { limit: 3 });
+  const scale = useParkScale(sid);
 
   const date = bp?.games[0]?.date ?? bp?.as_of ?? null;
   const games = sched?.games ?? [];
@@ -88,7 +89,7 @@ export default function TodayPage() {
 
       <section aria-labelledby="best-title">
         <h2 id="best-title" className="section-label">{t("bestHere")}</h2>
-        <p className="muted small hint"><Term k="stuff">Stuff+</Term> {t("bestHereHint")}</p>
+        <p className="muted small hint"><Term k="stuff">Stuff+</Term> {t("bestHereHint")} <Term k="verdict">{t("whatIsVerdict")}</Term></p>
         {top ? (
           <ol className="picks">
             {top.rows.map((r, i) => (
@@ -98,7 +99,7 @@ export default function TodayPage() {
                   <span className="pick-body">
                     <span className="pick-head">
                       <span className="pick-name num">{r.name}</span>
-                      <Verdict kind={verdictFor(r.stuff_plus)} />
+                      <Verdict kind={verdictFor(r.stuff_plus, scale)} />
                     </span>
                     <span className="pick-why">{pitcherPhrase(t, lang, r, sid === meta?.home_stadium_id ? "home" : "here")}</span>
                   </span>
@@ -112,7 +113,7 @@ export default function TodayPage() {
 
       <section aria-labelledby="bullpen-title" className="today-bullpen">
         <h2 id="bullpen-title" className="section-label">{t("yourBullpen")}</h2>
-        {bp.relievers.length > 0 ? <BullpenList data={bp} /> : (
+        {bp.relievers.length > 0 ? <BullpenList data={bp} scale={scale} /> : (
           <div className="empty-note">
             <Diablo size={44} still />
             <p>{t("bullpenEmpty")}</p>
