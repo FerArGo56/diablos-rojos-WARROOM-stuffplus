@@ -17,6 +17,10 @@ type FullList = { rows: FreeAgentRow[]; total: number; medians: Record<string, n
 
 const SORT_KEY = { home: "stuff_home", neutral: "stuff_neutral", fit: "fit" } as const;
 
+/** Escala del Harp Helú por rol: cada candidato se compara con los de su mismo rol. */
+type RoleScales = { SP: ParkScale; RP: ParkScale };
+const scaleOf = (s: RoleScales, r: { role: string }) => (r.role === "SP" ? s.SP : s.RP);
+
 /** La lista completa, para poder filtrar por veredicto (se calcula en el frontend).
  *  Como el API entrega máximo 500 por consulta, se pide por rol × mano y se junta. */
 function useFullList(f: Filters | null) {
@@ -54,7 +58,10 @@ export function FreeAgentTable({ compact = false }: { compact?: boolean }) {
   const [throws, setThrows] = useState<"" | "Right" | "Left">("");
   const [pickedSort, setSort] = useState<"home" | "neutral" | "fit">("home");
   const [verdict, setVerdict] = useState<"" | SignVerdict>("");
-  const home = useParkScale(meta?.home_stadium_id ?? "harp-helu");
+  const homeId = meta?.home_stadium_id ?? "harp-helu";
+  const homeSP = useParkScale(homeId, "SP");
+  const homeRP = useParkScale(homeId, "RP");
+  const home = useMemo(() => (homeSP && homeRP ? { SP: homeSP, RP: homeRP } : null), [homeSP, homeRP]);
   const [pages, setPages] = useState(1);
 
   const small = useApi<FreeAgents>(compact ? "/free-agents" : null, { status, role, throws, sort: pickedSort, limit: 6 });
@@ -68,10 +75,10 @@ export function FreeAgentTable({ compact = false }: { compact?: boolean }) {
   const all = useMemo(() => (home ? (compact ? small.data?.rows : full.data?.rows) ?? null : null), [home, compact, small.data, full.data]);
   const counts = useMemo(() => {
     const c: Record<SignVerdict, number> = { sign: 0, watch: 0, no: 0 };
-    if (home) for (const r of all ?? []) c[signingFor(r, home).verdict]++;
+    if (home) for (const r of all ?? []) c[signingFor(r, scaleOf(home, r)).verdict]++;
     return c;
   }, [all, home]);
-  const filtered = useMemo(() => (all && home && verdict ? all.filter((r) => signingFor(r, home).verdict === verdict) : all), [all, home, verdict]);
+  const filtered = useMemo(() => (all && home && verdict ? all.filter((r) => signingFor(r, scaleOf(home, r)).verdict === verdict) : all), [all, home, verdict]);
   const shown = compact ? filtered : filtered?.slice(0, pages * PAGE);
   const reset = () => setPages(1);
 
@@ -160,9 +167,9 @@ export function FreeAgentTable({ compact = false }: { compact?: boolean }) {
   );
 }
 
-function FaRow({ r, compact, home }: { r: FreeAgentRow; compact: boolean; home: ParkScale }) {
+function FaRow({ r, compact, home }: { r: FreeAgentRow; compact: boolean; home: RoleScales }) {
   const { t, lang } = useLang();
-  const s = signingFor(r, home);
+  const s = signingFor(r, scaleOf(home, r));
   const hand = r.throws === "Right" ? t("right") : t("left");
   return (
     <li className="fa-row">
