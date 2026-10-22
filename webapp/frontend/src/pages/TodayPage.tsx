@@ -3,6 +3,8 @@ import { Link } from "react-router-dom";
 import type { Bullpen, Game, LeaderRow, Schedule, StadiumDetail } from "../api";
 import { BullpenList } from "../components/BullpenList";
 import { CountUp } from "../components/CountUp";
+import { LoopVideo } from "../components/LoopVideo";
+import { VIDEOS } from "../media";
 import { Diablo } from "../components/Diablo";
 import { Term } from "../components/Term";
 import { Verdict } from "../components/Verdict";
@@ -127,6 +129,8 @@ export default function TodayPage() {
           </div>
         )}
       </section>
+
+      {VIDEOS.hoy && <LoopVideo {...VIDEOS.hoy} />}
     </main>
   );
 }
