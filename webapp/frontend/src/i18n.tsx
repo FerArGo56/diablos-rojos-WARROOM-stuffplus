@@ -210,7 +210,7 @@ const LangCtx = createContext<{ lang: Lang; setLang: (l: Lang) => void; t: T; d:
 function fill(s: string, v?: Vars): string {
   if (v === undefined || v === null) return s.replace("{v}", "");
   if (typeof v !== "object") return s.replace("{v}", String(v));
-  return s.replace(/\{(\w)\}/g, (m, k: string) => {
+  return s.replace(/\{(\w+)\}/g, (m, k: string) => {
     const lower = k.toLowerCase();
     if (!(lower in v)) return m;
     const val = String(v[lower]);

@@ -293,14 +293,14 @@ table.data td.r, table.data th.r { text-align: right; }
   .more-menu { display: block; }
   .bottomnav {
     position: fixed; left: 0; right: 0; bottom: 0; z-index: var(--z-bottomnav);
-    display: grid; grid-template-columns: repeat(3, 1fr);
+    display: grid; grid-template-columns: repeat(4, 1fr);
     padding-bottom: env(safe-area-inset-bottom);
     background: rgba(11, 11, 13, 0.94); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
     border-top: 1px solid var(--line);
   }
   .bottomnav a {
     display: flex; align-items: center; justify-content: center; min-height: var(--bottomnav-h);
-    font-family: var(--display); font-weight: 800; font-size: 15px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted);
+    font-family: var(--display); font-weight: 800; font-size: 14px; text-transform: uppercase; letter-spacing: 0.03em; color: var(--muted); white-space: nowrap;
     box-shadow: inset 0 2px 0 transparent; transition: color var(--dur-fast) var(--ease-out), box-shadow var(--dur-fast) var(--ease-out);
   }
   .bottomnav a.active { color: var(--text); box-shadow: inset 0 3px 0 var(--red); }
@@ -418,3 +418,35 @@ table.data td.r, table.data th.r { text-align: right; }
   .fa-detail summary { justify-content: center; width: 100%; }
   .fa-detail dl { grid-template-columns: 1fr; }
 }
+
+/* ------------------------------------------------------------ ¿y si…? */
+.wi { max-width: 1100px; display: flex; flex-direction: column; gap: var(--sp-5); }
+.wi h1 { font-size: var(--fs-display); line-height: 0.92; }
+.wi .lede { margin: calc(-1 * var(--sp-3)) 0 0; }
+.wi-controls { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 320px); gap: var(--sp-3); align-items: end; }
+.wi-park { display: flex; flex-direction: column; gap: 4px; }
+.wi-park .sel { width: 100%; min-height: 44px; }
+.wi-quick { display: flex; flex-wrap: wrap; gap: var(--sp-2); }
+.wi-start p { margin: 0 0 var(--sp-3); }
+.wi-verdict { display: flex; justify-content: space-between; align-items: flex-end; gap: var(--sp-5); flex-wrap: wrap; box-shadow: var(--shadow-1); }
+.wi-verdict h2 { font-size: var(--fs-xl); text-transform: none; letter-spacing: -0.01em; margin: 4px 0; }
+.wi-profile { text-decoration: underline; text-underline-offset: 3px; }
+.wi-score { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; text-align: right; }
+.wi-line { margin: 0; font-size: var(--fs-md); }
+.wi-score .faint { margin: 0; }
+.wi-phrases { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--sp-2); }
+.wi-phrases li { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: var(--sp-3); align-items: baseline; font-size: var(--fs-md); padding: var(--sp-2) 0; border-bottom: 1px solid var(--line); }
+.wi-phrases li:last-child { border-bottom: 0; }
+.wi-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--sp-4); align-items: start; }
+.wi-legend { display: flex; gap: var(--sp-4); flex-wrap: wrap; margin-top: var(--sp-2); }
+.wi-legend > span { display: inline-flex; align-items: center; gap: 6px; }
+.lg-ring, .lg-fill { width: 12px; height: 12px; border-radius: 50%; display: inline-block; }
+.lg-ring { border: 1.6px dashed var(--muted); }
+.lg-fill { background: var(--muted); }
+.wi-staff p { margin: 0; }
+@media (max-width: 767px) {
+  .wi { gap: var(--sp-4); }
+  .wi-controls, .wi-grid { grid-template-columns: 1fr; }
+  .wi-score { align-items: flex-start; text-align: left; }
+}
+table.data tbody th { text-transform: none; font-family: var(--body); font-size: 14px; letter-spacing: 0; color: var(--text); padding: 8px; border-bottom: 1px solid var(--line); }

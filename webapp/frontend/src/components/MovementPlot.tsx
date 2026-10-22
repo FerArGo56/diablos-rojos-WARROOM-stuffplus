@@ -8,10 +8,10 @@ const R = 26; // inches shown in each direction
 const sx = (v: number) => PAD + ((v + R) / (2 * R)) * (W - 2 * PAD);
 const sy = (v: number) => H - PAD - ((v + R) / (2 * R)) * (H - 2 * PAD);
 
-export function MovementPlot({ pitches, visible, xLabel, yLabel }: { pitches: ProjectedPitch[]; visible: Set<string>; xLabel: string; yLabel: string }) {
+export function MovementPlot({ pitches, visible, xLabel, yLabel, label }: { pitches: ProjectedPitch[]; visible: Set<string>; xLabel: string; yLabel: string; label?: string }) {
   const ticks = [-20, -10, 0, 10, 20];
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} style={{ width: "100%", height: "auto", display: "block" }} role="img">
+    <svg viewBox={`0 0 ${W} ${H}`} style={{ width: "100%", height: "auto", display: "block" }} role="img" aria-label={label ?? `${xLabel} / ${yLabel}`}>
       <defs>
         <marker id="mv-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
           <path d="M0 0 L10 5 L0 10 z" fill="var(--chalk)" />

@@ -9,6 +9,7 @@ import ExplorePage from "./pages/ExplorePage";
 import StadiumPage from "./pages/StadiumPage";
 import PitcherPage from "./pages/PitcherPage";
 import FreeAgentsPage from "./pages/FreeAgentsPage";
+import WhatIfPage from "./pages/WhatIfPage";
 import MethodologyPage from "./pages/MethodologyPage";
 
 export default function App() {
@@ -27,6 +28,7 @@ export default function App() {
         <nav className="nav nav-desktop" aria-label={t("mainNav")}>
           <NavLink to="/" end>{t("navToday")}</NavLink>
           <NavLink to="/agentes-libres">{t("navFreeAgents")}</NavLink>
+          <NavLink to="/y-si">{t("navWhatIf")}</NavLink>
           <NavLink to="/explorar">{t("navExplore")}</NavLink>
           <NavLink to="/metodologia">{t("navMethod")}</NavLink>
         </nav>
@@ -46,6 +48,7 @@ export default function App() {
           <Route path="/estadio/:id" element={<StadiumPage />} />
           <Route path="/lanzador/:id" element={<PitcherPage />} />
           <Route path="/agentes-libres" element={<FreeAgentsPage />} />
+          <Route path="/y-si" element={<WhatIfPage />} />
           <Route path="/metodologia" element={<MethodologyPage />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
