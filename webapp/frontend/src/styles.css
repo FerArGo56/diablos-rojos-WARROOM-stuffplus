@@ -103,12 +103,13 @@ p { text-wrap: pretty; }
 .verdict.v-lg { font-size: clamp(22px, 2vw + 14px, 32px); gap: 10px; }
 .verdict .v-note { font-family: var(--body); font-weight: 600; font-size: 12px; letter-spacing: 0; text-transform: none; color: var(--muted); }
 .v-elite { --vc: var(--v-elite); } .v-good { --vc: var(--v-good); } .v-avg { --vc: var(--v-avg); } .v-avoid { --vc: var(--v-avoid); }
-.v-sign { --vc: var(--v-elite); } .v-watch { --vc: var(--v-watch); } .v-no { --vc: var(--v-avoid); }
+.v-sign { --vc: var(--v-elite); } .v-promising { --vc: var(--v-good); } .v-watch { --vc: var(--v-watch); } .v-no { --vc: var(--v-avoid); }
 .v-shape { display: inline-block; width: 0.72em; height: 0.72em; background: var(--vc); flex: none; }
 .v-shape.diamond { transform: rotate(45deg) scale(0.86); border-radius: 1px; }
 .v-shape.up { clip-path: polygon(50% 4%, 100% 92%, 0 92%); }
 .v-shape.down { clip-path: polygon(0 8%, 100% 8%, 50% 96%); }
 .v-shape.dot { border-radius: 50%; transform: scale(0.8); }
+.v-shape.half { border-radius: 50%; transform: scale(0.8); background: linear-gradient(90deg, var(--vc) 50%, transparent 50%); box-shadow: inset 0 0 0 1.5px var(--vc); }
 
 /* ------------------------------------------------------------ glossary term */
 .term { background: none; border: 0; padding: 0; font: inherit; color: inherit; text-transform: inherit; letter-spacing: inherit; text-decoration: underline dotted color-mix(in srgb, currentColor 55%, transparent); text-underline-offset: 3px; cursor: help; }
@@ -457,9 +458,9 @@ table.data tbody th { text-transform: none; font-family: var(--body); font-size:
 /* filtro por veredicto: el mismo lenguaje de forma + texto + color */
 .fa-verdicts { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: var(--sp-3); }
 @media (max-width: 480px) {
-  .fa-verdicts { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); }
-  .fa-verdicts button { display: grid; grid-template-columns: auto auto; justify-content: center; align-items: center; column-gap: 5px; row-gap: 2px; padding: 6px 4px; border-radius: var(--radius-sm); font-size: 14px; min-height: 52px; }
-  .fa-verdicts button .num { grid-column: 1 / -1; text-align: center; }
+  .fa-verdicts { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; margin-inline: -16px; padding-inline: 16px; scroll-padding-inline: 16px; }
+  .fa-verdicts::-webkit-scrollbar { display: none; }
+  .fa-verdicts button { flex: none; font-size: 14px; padding: 0 10px; }
 }
 .fa-verdicts button { display: inline-flex; align-items: center; gap: 6px; min-height: 40px; padding: 0 11px; border-radius: 999px; background: var(--panel); border: 1px solid var(--line-2); color: var(--muted); font-family: var(--display); font-weight: 800; font-size: 15px; text-transform: uppercase; letter-spacing: 0.04em; transition: background-color var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out); }
 .fa-verdicts button .num { font-family: var(--mono); font-size: 13px; font-weight: 500; letter-spacing: 0; color: var(--faint); }

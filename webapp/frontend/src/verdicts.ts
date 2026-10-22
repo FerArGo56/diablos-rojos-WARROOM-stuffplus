@@ -6,7 +6,7 @@
 // así que un corte absoluto dejaba a casi todos "Evitar" en casa y "Bueno" al nivel del mar.
 
 export type StuffVerdict = "elite" | "good" | "avg" | "avoid";
-export type SignVerdict = "sign" | "watch" | "no";
+export type SignVerdict = "sign" | "promising" | "watch" | "no";
 export type VerdictKind = StuffVerdict | SignVerdict;
 
 /** Percentiles dentro del parque: Élite = 5% más alto · Bueno = siguiente 20% · Evitar = 15% más bajo. */
@@ -60,13 +60,13 @@ export function signingFor(row: { fit: number | null; stuff_home: number; n_pitc
   } else {
     verdict = "no";
   }
-  // La muestra chica nunca alcanza para "Fichar": a lo más se vigila.
-  if (smallSample && verdict === "sign") verdict = "watch";
+  // Bueno pero con poco volumen: estaría en "Fichar", pero la muestra chica no alcanza para decidir.
+  if (smallSample && verdict === "sign") verdict = "promising";
   return { verdict, smallSample, noStaff };
 }
 
 /** Color del token de veredicto (para números sueltos; el veredicto completo usa <Verdict>). */
 export const VERDICT_COLOR: Record<VerdictKind, string> = {
   elite: "var(--v-elite)", good: "var(--v-good)", avg: "var(--v-avg)", avoid: "var(--v-avoid)",
-  sign: "var(--v-elite)", watch: "var(--v-watch)", no: "var(--v-avoid)",
+  sign: "var(--v-elite)", promising: "var(--v-good)", watch: "var(--v-watch)", no: "var(--v-avoid)",
 };
