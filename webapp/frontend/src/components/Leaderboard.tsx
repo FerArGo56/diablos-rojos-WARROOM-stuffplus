@@ -1,8 +1,9 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useRef, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import type { LeaderRow } from "../api";
 import { PITCH_NAMES, useLang } from "../i18n";
-import { PITCH_COLORS, fmt, signed, stuffColor, useApi, useAppState } from "../state";
+import { Term } from "./Term";
+import { PITCH_COLORS, fmt, signed, stuffColor, useApi, useAppState, useParkScale } from "../state";
 
 type Board = { stadium_id: string; season: number; min_pitches: number; total: number; rows: LeaderRow[] };
 
@@ -22,12 +23,22 @@ export function Leaderboard({ stadiumId, venueName, onPick, onClose }: { stadium
   const [role, setRole] = useState<"" | "SP" | "RP">("");
   const { data } = useApi<Board>(`/stadiums/${stadiumId}/leaderboard`, { role, limit: 100 });
   const ourTeam = useAppState().meta?.our_team_code ?? "MEX";
+  const closeRef = useRef<HTMLButtonElement>(null);
+  const scale = useParkScale(stadiumId);
+  // Escape cierra; al abrir el foco va a "Cerrar" y al cerrar regresa a donde estaba.
+  useEffect(() => {
+    const prev = document.activeElement as HTMLElement | null;
+    closeRef.current?.focus();
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    document.addEventListener("keydown", onKey);
+    return () => { document.removeEventListener("keydown", onKey); prev?.focus?.(); };
+  }, [onClose]);
 
   return (
     <>
       <div className="drawer-scrim" onClick={onClose} />
-      <aside className="drawer" style={{ width: "min(860px, 100vw)" }} role="dialog" aria-label={t("crownTitle")}>
-        <button className="drawer-close" onClick={onClose} aria-label="close">✕</button>
+      <aside className="drawer" style={{ width: "min(860px, 100vw)" }} role="dialog" aria-modal="true" aria-label={t("crownTitle")}>
+        <button ref={closeRef} type="button" className="drawer-close" onClick={onClose} aria-label={t("close")}>✕</button>
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
           <CrownIcon size={40} />
           <div>
@@ -43,17 +54,17 @@ export function Leaderboard({ stadiumId, venueName, onPick, onClose }: { stadium
           <table className="data">
             <thead><tr>
               <th>{t("rank")}</th><th>{t("pitcher")}</th><th>{t("team")}</th><th>{t("bestPitch")}</th>
-              <th className="r">Stuff+</th><th className="r">{t("neutral")}</th><th className="r">{t("altitudeDelta")}</th>
+              <th className="r"><Term k="stuff">Stuff+</Term></th><th className="r">{t("neutral")}</th><th className="r">{t("altitudeDelta")}</th>
             </tr></thead>
             <tbody>
               {data?.rows.map((r) => (
                 <tr key={r.pitcher_id} className="clickable" onClick={() => (onPick ? onPick(r.pitcher_id) : navigate(`/lanzador/${r.pitcher_id}`))}
                   style={r.status === ourTeam ? { background: "rgba(213,16,47,0.10)" } : undefined}>
                   <td className="num" style={{ color: r.rank <= 3 ? "var(--gold)" : "var(--muted)", fontWeight: 700 }}>{r.rank}</td>
-                  <td><span className="num" style={{ fontWeight: 600 }}>{r.name}</span> <span className="faint small">{r.throws === "Right" ? "R" : "L"} · {r.role}</span></td>
+                  <td><Link to={`/lanzador/${r.pitcher_id}`} className="num" style={{ fontWeight: 600 }} onClick={(e) => e.stopPropagation()}>{r.name}</Link> <span className="faint small">{r.throws === "Right" ? "R" : "L"} · {r.role}</span></td>
                   <td>{r.status === "FA" ? <span className="chip gold">{t("freeAgent")}</span> : <span className={`chip ${r.status === ourTeam ? "red" : ""}`}>{r.status}</span>}</td>
                   <td>{r.best_pitch && <span style={{ display: "inline-flex", gap: 6, alignItems: "center" }}><span className="dot" style={{ background: PITCH_COLORS[r.best_pitch] }} />{PITCH_NAMES[lang][r.best_pitch]}</span>}</td>
-                  <td className="r num" style={{ color: stuffColor(r.stuff_plus), fontWeight: 700 }}>{fmt(r.stuff_plus)}</td>
+                  <td className="r num" style={{ color: stuffColor(r.stuff_plus, scale), fontWeight: 700 }}>{fmt(r.stuff_plus)}</td>
                   <td className="r num muted">{fmt(r.stuff_neutral)}</td>
                   <td className="r num" style={{ color: r.altitude_delta >= 0 ? "var(--good)" : "var(--bad)" }}>{signed(r.altitude_delta)}</td>
                 </tr>
