@@ -369,3 +369,52 @@ table.data td.r, table.data th.r { text-align: right; }
 .empty-note p:last-child { margin: 0; }
 
 @media (max-width: 767px) { .today { gap: var(--sp-3); padding-top: var(--sp-3); } .sb-park { margin-top: var(--sp-3); } .sb-opp { padding-top: var(--sp-2); } .park-line { font-size: var(--fs-md); } .pick-link { padding: var(--sp-2) var(--sp-3); } .series { margin-top: 0; } }
+
+/* ------------------------------------------------------------ fichajes */
+.fa-page h1 { font-size: var(--fs-display); line-height: 0.92; }
+.lede { margin: var(--sp-2) 0 var(--sp-5); font-size: var(--fs-md); max-width: 60ch; }
+.fa { container-type: inline-size; }
+.fa-filters { display: flex; gap: var(--sp-2); flex-wrap: wrap; align-items: center; margin-bottom: var(--sp-3); }
+.fa-sort { display: inline-flex; align-items: center; gap: 6px; }
+.fa-rule { margin: 0 0 var(--sp-4); font-size: var(--fs-sm); color: var(--muted); max-width: 75ch; }
+.fa-head { display: none; }
+.fa-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--sp-2); }
+.fa-row {
+  display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: var(--sp-2) var(--sp-3);
+  grid-template-areas: "verdict num" "who who" "why why" "actions actions";
+  padding: var(--sp-3) var(--sp-4); background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius);
+}
+.fa-verdict { grid-area: verdict; display: flex; align-items: center; }
+.fa-who { grid-area: who; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.fa-name { font-weight: 700; font-size: var(--fs-md); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.fa-name:hover { text-decoration: underline; text-underline-offset: 3px; }
+.fa-meta { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; font-size: var(--fs-sm); color: var(--muted); }
+.fa-why { grid-area: why; margin: 0; font-size: var(--fs-sm); color: var(--text); line-height: 1.4; }
+.fa-num { grid-area: num; display: flex; flex-direction: column; align-items: flex-end; justify-content: center; }
+.fa-num .num { font-size: var(--fs-md); font-weight: 700; color: var(--muted); }
+.fa-num-l { font-size: 11px; color: var(--faint); text-transform: uppercase; letter-spacing: 0.04em; white-space: nowrap; }
+.fa-actions { grid-area: actions; display: flex; flex-wrap: wrap; align-items: flex-start; gap: var(--sp-2); }
+.fa-detail { flex: 1 1 100%; }
+.fa-detail summary { cursor: pointer; display: inline-flex; align-items: center; min-height: 36px; font-size: var(--fs-sm); color: var(--muted); font-weight: 600; }
+.fa-detail summary:hover { color: var(--text); }
+.fa-detail dl { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: var(--sp-2) var(--sp-4); margin: var(--sp-2) 0 0; padding: var(--sp-3); background: var(--bg-2); border-radius: var(--radius-sm); }
+.fa-detail dt { font-size: var(--fs-xs); color: var(--muted); }
+.fa-detail dd { margin: 2px 0 0; font-weight: 600; }
+.fa-foot { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-3); margin-top: var(--sp-4); flex-wrap: wrap; }
+.fa-compact .fa-row { grid-template-areas: "verdict num" "who who" "why why"; }
+
+/* filas tipo tabla cuando hay ancho (también dentro del panel de Explorar) */
+@container (min-width: 760px) {
+  .fa-head, .fa-row { grid-template-columns: 150px minmax(140px, 200px) minmax(0, 1fr) 90px 200px; grid-template-areas: "verdict who why num actions"; }
+  .fa-compact .fa-head, .fa-compact .fa-row { grid-template-columns: 140px minmax(140px, 200px) minmax(0, 1fr) 90px; grid-template-areas: "verdict who why num"; }
+  .fa-head { display: grid; gap: var(--sp-3); padding: 0 var(--sp-4) var(--sp-2); font-family: var(--display); text-transform: uppercase; letter-spacing: 0.06em; font-size: var(--fs-xs); font-weight: 700; color: var(--muted); border-bottom: 1px solid var(--line-2); }
+  .fa-head .r { text-align: right; }
+  .fa-list { gap: 0; }
+  .fa-row { align-items: center; gap: var(--sp-3); background: none; border: 0; border-bottom: 1px solid var(--line); border-radius: 0; transition: background-color var(--dur-fast) var(--ease-out); }
+  .fa-row:hover { background: rgba(255, 255, 255, 0.025); }
+  .fa-num-l { display: none; }
+  .fa-actions { flex-direction: column; align-items: stretch; }
+  .fa-actions .btn { justify-content: center; }
+  .fa-detail summary { justify-content: center; width: 100%; }
+  .fa-detail dl { grid-template-columns: 1fr; }
+}
