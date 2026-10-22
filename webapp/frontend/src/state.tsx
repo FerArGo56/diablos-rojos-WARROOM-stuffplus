@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from "react";
 import { api, type Meta } from "./api";
 import { VERDICT_COLOR, verdictFor } from "./verdicts";
 
@@ -34,6 +34,7 @@ export function useApi<T>(path: string | null, params?: Record<string, string | 
   const [data, setData] = useState<T | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [attempt, setAttempt] = useState(0);
   const key = path ? path + JSON.stringify(params ?? {}) : null;
   useEffect(() => {
     if (!path) { setData(null); return; }
@@ -46,8 +47,9 @@ export function useApi<T>(path: string | null, params?: Record<string, string | 
       .finally(() => { if (alive) setLoading(false); });
     return () => { alive = false; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [key]);
-  return { data, error, loading };
+  }, [key, attempt]);
+  const retry = useCallback(() => setAttempt((n) => n + 1), []);
+  return { data, error, loading, retry };
 }
 
 type AppState = {
