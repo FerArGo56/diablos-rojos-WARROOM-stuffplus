@@ -1,10 +1,10 @@
 import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 import { useLang } from "../i18n";
 
-const GLOSSARY = { stuff: "g_stuff", ivb: "g_ivb", hb: "g_hb", whiff: "g_whiff", fit: "g_fit", verdict: "g_verdict" } as const;
+const GLOSSARY = { stuff: "g_stuff", ivb: "g_ivb", hb: "g_hb", whiff: "g_whiff", fit: "g_fit", verdict: "g_verdict", signNoStaff: "g_signNoStaff", signFit: "g_signFit" } as const;
 
 /** Término técnico con su explicación en lenguaje simple. Abre con hover, foco o toque; cierra con Escape. */
-export function Term({ k, children }: { k: keyof typeof GLOSSARY; children: ReactNode }) {
+export function Term({ k, vars, children }: { k: keyof typeof GLOSSARY; vars?: Record<string, string | number>; children: ReactNode }) {
   const { t } = useLang();
   const id = useId();
   const ref = useRef<HTMLButtonElement>(null);
@@ -33,7 +33,7 @@ export function Term({ k, children }: { k: keyof typeof GLOSSARY; children: Reac
         onClick={() => (pos ? close() : open())}>
         {children}
       </button>
-      {pos && <span role="tooltip" id={id} className="term-tip" style={{ top: pos.top, left: pos.left }}>{t(GLOSSARY[k])}</span>}
+      {pos && <span role="tooltip" id={id} className="term-tip" style={{ top: pos.top, left: pos.left }}>{t(GLOSSARY[k], vars)}</span>}
     </>
   );
 }
