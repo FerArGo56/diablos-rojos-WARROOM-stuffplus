@@ -6,7 +6,7 @@ import { SearchBox } from "../components/SearchBox";
 import { Term } from "../components/Term";
 import { Verdict } from "../components/Verdict";
 import { fmtInt, useLang } from "../i18n";
-import { pitchName, pitchPhrase } from "../phrases";
+import { pitchName, pitchPhrase, vsSea } from "../phrases";
 import { PITCH_COLORS, fmt, signed, useApi, useAppState, useParkScale } from "../state";
 import { verdictFor, type ParkScale } from "../verdicts";
 
@@ -92,7 +92,9 @@ function Result({ proj, fa, scale, isHome, onHome }: { proj: Projection; fa: Fre
           <Verdict kind={verdictFor(here, scale)} size="lg" />
           <p className="wi-line">
             {t("wiStuffLine", { n: fmt(here), park: proj.stadium.venue_name })}
-            {here != null && sea != null && <> · <span className="num">{t("wiVsSea", { d: signed(here - sea) })}</span></>}
+          </p>
+          <p className="wi-sea">
+            {vsSea(here, sea) === 0 ? t("sameAsSea") : vsSea(here, sea) != null && <><span className="num">{signed(vsSea(here, sea))}</span> {t("wiVsSea")}</>}
           </p>
           <p className="faint small"><Term k="stuff">{t("whatIsStuff")}</Term> · <Term k="verdict">{t("whatIsVerdict")}</Term></p>
         </div>

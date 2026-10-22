@@ -8,7 +8,7 @@ import { StrikeZone } from "../components/StrikeZone";
 import { Term } from "../components/Term";
 import { Verdict } from "../components/Verdict";
 import { PITCH_NAMES, fmtInt, useLang } from "../i18n";
-import { leaguePitchEffect, parkPhrase, pitchPhrase, pitcherPhrase } from "../phrases";
+import { leaguePitchEffect, parkPhrase, pitchPhrase, pitcherPhrase, vsSea } from "../phrases";
 import { PITCH_COLORS, altitudeColor, fmt, signed, useApi, useAppState, useParkScale } from "../state";
 import { verdictFor } from "../verdicts";
 
@@ -87,7 +87,8 @@ export default function StadiumPage() {
             <div className="wi-score">
               <Verdict kind={verdictFor(p.stuff_here, scale)} size="lg" />
               <p className="wi-line"><span className="num">{fmt(p.stuff_here)}</span> <Term k="stuff">Stuff+</Term> {t("here")}
-                {p.stuff_here != null && p.stuff_sea != null && <> · <span className="num">{t("vsSeaShort", { d: signed(p.stuff_here - p.stuff_sea) })}</span></>}</p>
+</p>
+              <p className="wi-sea">{vsSea(p.stuff_here, p.stuff_sea) === 0 ? t("sameAsSea") : vsSea(p.stuff_here, p.stuff_sea) != null && <><span className="num">{signed(vsSea(p.stuff_here, p.stuff_sea))}</span> {t("wiVsSea")}</>}</p>
             </div>
             <ul className="wi-phrases sel-phrases">
               {[...ready.pitches].sort((a, b) => b.usage - a.usage).map((x) => (
