@@ -25,11 +25,11 @@
   "niveles_altitud": [
     {
       "nivel": "Extreme Altitude",
-      "desde_m": 2000
+      "desde_m": 1800
     },
     {
       "nivel": "Medium Altitude",
-      "desde_m": 1000
+      "desde_m": 800
     },
     {
       "nivel": "No Altitude",

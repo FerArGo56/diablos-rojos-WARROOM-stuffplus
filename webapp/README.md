@@ -108,5 +108,5 @@ Son 12 pruebas (unos 10 segundos). Simulan el API 1 y el API 2 con datos sintét
 
 - **Los datos actuales están anonimizados:** no traen equipos ni fechas. Por eso los pitchers aparecen como "Equipo ?", el bullpen explica que todavía no sabe quién es del staff, y el estudio de altitud se agrupa por `altitude_category`.
 - **Calendario (provisional):** por ahora la app usa el calendario 2026 de la LMB, descargado de la API de estadísticas de MLB. Tiene 99 partidos de los Diablos: 97 jugados (48 en casa y 49 de visita) y 2 pospuestos. Cuando salga el calendario 2027, se puede actualizar desde `webapp/backend/` con `python3 scripts/fetch_schedule.py --season 2027`, que crea `data/schedule/2027.csv`.
-- **Altitudes:** las de Harp Helú (2,232 m) y Serdán (2,192 m) son oficiales de la LMB. Las demás son aproximadas y están en `stadiums.json`.
+- **Altitudes:** las de los 20 estadios son oficiales, del equipo de Diablos Rojos, y están en `stadiums.json`.
 - **Física:** el Magnus y el arrastre cambian con la densidad del aire. La humedad no se toma en cuenta.
