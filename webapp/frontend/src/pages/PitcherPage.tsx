@@ -25,7 +25,7 @@ export default function PitcherPage() {
 
   return (
     <main className="page">
-      <Link to="/" className="muted small">← {t("backToMap")}</Link>
+      <Link to="/explorar" className="muted small back-link">← {t("backToMap")}</Link>
       <section className="stadium-hero" style={{ marginTop: 10 }}>
         <div>
           <div className="eyebrow">{p.role === "SP" ? t("sp") : t("rp")} · {p.throws === "Right" ? t("right") : t("left")}</div>

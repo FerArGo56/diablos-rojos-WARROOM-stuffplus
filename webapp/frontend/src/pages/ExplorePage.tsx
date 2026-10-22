@@ -7,7 +7,7 @@ import { SearchBox } from "../components/SearchBox";
 import { useLang } from "../i18n";
 import { useApi } from "../state";
 
-export default function Home() {
+export default function ExplorePage() {
   const { t } = useLang();
   const { data: stadiums } = useApi<Stadium[]>("/stadiums");
   const [highlight, setHighlight] = useState<string | null>(null);
