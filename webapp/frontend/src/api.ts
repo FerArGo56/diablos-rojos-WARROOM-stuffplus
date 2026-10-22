@@ -1,3 +1,5 @@
+import { noteResponse } from "./offline";
+
 // Typed client for the FastAPI backend. Set VITE_API_URL when the API lives on another host.
 const BASE = (import.meta.env.VITE_API_URL as string | undefined)?.replace(/\/$/, "") ?? "";
 
@@ -6,6 +8,7 @@ export async function api<T>(path: string, params?: Record<string, string | numb
   if (params) for (const [k, v] of Object.entries(params)) if (v !== undefined && v !== null && v !== "") url.searchParams.set(k, String(v));
   const res = await fetch(url.toString());
   if (!res.ok) throw new Error(`${res.status} ${await res.text()}`);
+  noteResponse(res);
   return res.json() as Promise<T>;
 }
 
