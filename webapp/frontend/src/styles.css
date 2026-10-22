@@ -605,20 +605,12 @@ table.data tbody th { text-transform: none; font-family: var(--body); font-size:
 .pitch3d-bar > .faint { flex-basis: 100%; }
 
 /* ------------------------------------------------------------ videos (etapa 2) */
-/* intro: altímetro y frase encima del video, legibles con un degradado */
-.intro::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(180deg, rgba(0,0,0,.55) 0%, transparent 30%, transparent 60%, rgba(0,0,0,.6) 100%); }
-.intro-hud, .intro-phrase { text-shadow: 0 2px 14px rgba(0, 0, 0, 0.65); }
-.intro-hud { position: absolute; z-index: 1; top: max(24px, env(safe-area-inset-top)); left: max(20px, env(safe-area-inset-left)); display: flex; flex-direction: column; gap: 2px; color: #fff; }
-.intro-alt-l { font-family: var(--display); font-weight: 800; font-size: 13px; letter-spacing: 0.12em; text-transform: uppercase; opacity: 0.85; }
-.intro-alt { font-family: var(--mono); font-variant-numeric: tabular-nums; font-weight: 700; font-size: clamp(36px, 5vw + 16px, 84px); line-height: 1; letter-spacing: -0.03em; }
-.intro-phrase { position: absolute; z-index: 1; left: 0; right: 0; bottom: max(96px, calc(env(safe-area-inset-bottom) + 84px)); margin: 0; padding: 0 24px; text-align: center; color: #fff; font-family: var(--display); font-weight: 800; text-transform: uppercase; letter-spacing: -0.01em; font-size: clamp(28px, 3vw + 16px, 60px); line-height: 1; text-wrap: balance; animation: route-in 400ms var(--ease-out) both; }
-.intro-skip { z-index: 2; }
-
 /* Explorar: el lanzamiento de fondo del encabezado, oscurecido para leer el título y el buscador */
-.loop-video-background { position: absolute; inset: 0; z-index: 0; border: 0; border-radius: inherit; }
+/* se recorta solo el video (no el encabezado): la lista del buscador puede salir del encabezado */
+.loop-video-background { position: absolute; inset: 0; z-index: 0; border: 0; border-radius: inherit; overflow: hidden; }
 .loop-video-background::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(90deg, rgba(11,11,13,.92) 0%, rgba(11,11,13,.75) 45%, rgba(11,11,13,.45) 100%), linear-gradient(0deg, rgba(11,11,13,.85) 0%, transparent 50%); }
 .loop-video-background .loop-video-btn { z-index: 2; }
-.hero:has(.loop-video) { position: relative; overflow: hidden; border-radius: var(--radius); padding: var(--sp-6) var(--sp-5); min-height: 260px; align-items: flex-end; }
+.hero:has(.loop-video) { position: relative; border-radius: var(--radius); padding: var(--sp-6) var(--sp-5); min-height: 260px; align-items: flex-end; }
 .hero:has(.loop-video) > :not(.loop-video) { position: relative; z-index: 1; }
 
 /* ¿Y si…?: el pitcher genérico junto al buscador (arriba en celular, a 40% de la pantalla como máximo) */

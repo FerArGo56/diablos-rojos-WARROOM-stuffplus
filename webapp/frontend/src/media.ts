@@ -21,12 +21,8 @@ export const VIDEO = {
   giroLento: file("giro-lento"),
 };
 
-/** Intro: duración máxima y altímetro. Los puntos de sincronía son [segundo del video, metros] y se
- *  interpolan en línea recta entre ellos; se afinan cuando llegue el video real (el dron no baja a
- *  velocidad constante). El último punto debe ser la altitud del Harp Helú. */
+/** Intro: duración máxima (si el video es más largo, se corta aquí). */
 export const INTRO_CONFIG = {
   maxSecondsDesktop: 10,
   maxSecondsMobile: 5,
-  altimeterDesktop: [[0, 4000], [3, 3600], [6, 2700], [8.5, 2232]] as [number, number][],
-  altimeterMobile: [[0, 2600], [3, 2232]] as [number, number][],
 };
