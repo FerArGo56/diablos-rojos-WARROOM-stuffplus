@@ -11,8 +11,6 @@ Tiene dos piezas:
 
 ## Pantallas
 
-## Pantallas
-
 | Pantalla | Ruta | Para quién | Qué muestra |
 |---|---|---|---|
 | **Explorar** (portada) | `/` | Todos | Mapa de los 20 parques, buscador, calendario de los Diablos y los mejores agentes libres |
@@ -26,7 +24,6 @@ Tiene dos piezas:
 - Todas las pantallas tienen botón **ES / EN**.
 - El detalle del rediseño (decisiones, usuarios y fases) está en [`docs/BRIEF_REDISENO.md`](docs/BRIEF_REDISENO.md).
 
-Todas las pantallas tienen botón **ES / EN**.
 ## Correrla
 
 **Lo normal:** desde la raíz del repo, `bash apis/instalar.sh` (una vez) y `bash apis/iniciar_todo.sh`. Prende los dos APIs y esta app juntos. Ver [`apis/README.md`](../apis/README.md).
