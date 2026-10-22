@@ -44,7 +44,8 @@ export default function PitcherPage() {
           {p.seasons.length > 1 && (
             <div className="seg">{p.seasons.map((s) => <button key={s} className={p.season === s ? "on" : ""} onClick={() => setSeason(s)}>{s}</button>)}</div>
           )}
-          <select className="sel" value="" onChange={(e) => e.target.value && navigate(`/estadio/${e.target.value}?p=${p.pitcher_id}`)}>
+          <Link to={`/y-si?p=${encodeURIComponent(p.pitcher_id)}`} className="btn primary">{t("tryWhatIf")}</Link>
+          <select className="sel" aria-label={t("viewInStadium")} value="" onChange={(e) => e.target.value && navigate(`/estadio/${e.target.value}?p=${p.pitcher_id}`)}>
             <option value="">{t("viewInStadium")}…</option>
             {stadiums?.map((s) => <option key={s.id} value={s.id}>{s.venue_name} ({s.altitude_m} m)</option>)}
           </select>

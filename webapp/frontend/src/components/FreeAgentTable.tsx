@@ -118,7 +118,7 @@ function FaRow({ r, compact }: { r: FreeAgentRow; compact: boolean }) {
       </div>
       {!compact && (
         <div className="fa-actions">
-          <Link to={`/y-si?p=${encodeURIComponent(r.pitcher_id)}`} className="btn">{t("tryWhatIf")}</Link>
+          <Link to={`/y-si?p=${encodeURIComponent(r.pitcher_id)}`} className="btn" aria-label={`${t("tryWhatIf")} ${r.name}`}>{t("tryWhatIf")}</Link>
           <details className="fa-detail">
             <summary>{t("seeDetail")}</summary>
             <dl>
