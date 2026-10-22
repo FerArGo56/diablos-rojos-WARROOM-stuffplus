@@ -89,7 +89,7 @@ export function ScheduleCalendar({ onHighlight }: { onHighlight?: (stadiumId: st
             </div>
           </div>
         )}
-        <Link to="/" className="btn primary"><Diablo size={18} /> {t("seeInToday")}</Link>
+        <Link to="/" className="btn"><Diablo size={18} /> {t("seeInToday")}</Link>
       </div>
     </div>
   );
