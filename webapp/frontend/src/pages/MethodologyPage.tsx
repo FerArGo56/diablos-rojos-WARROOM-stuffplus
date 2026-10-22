@@ -1,5 +1,5 @@
 import type { Methodology, Stadium, Validation } from "../api";
-import { useLang } from "../i18n";
+import { fmtInt, useLang } from "../i18n";
 import { altitudeColor, fmt, useApi } from "../state";
 
 function AltitudeChart({ data, stadiums }: { data: Methodology["altitude_study"]; stadiums: Stadium[] }) {
@@ -43,19 +43,19 @@ function ValidationTables({ v }: { v: Validation }) {
   return (
     <>
       {v?.metrics && (
-        <table className="data"><tbody>
+        <div className="table-wrap"><table className="data"><tbody>
           {v.metrics.map((m, i) => (
             <tr key={i}>
-              <td>{m.name}{m.split ? <div className="faint tiny">{m.split}</div> : null}</td>
+              <th scope="row">{m.name}{m.split ? <div className="faint tiny">{m.split}</div> : null}</th>
               <td className="r num" style={{ whiteSpace: "nowrap" }}>{m.value}</td>
             </tr>
           ))}
-        </tbody></table>
+        </tbody></table></div>
       )}
       {v?.submodels && v.submodels.length > 0 && (
-        <table className="data" style={{ marginTop: 10 }}><tbody>
-          {v.submodels.map((m, i) => <tr key={i}><td>{m.name}</td><td className="muted">{m.target}</td><td>{m.metric}</td><td className="r num">{m.value}</td></tr>)}
-        </tbody></table>
+        <div className="table-wrap"><table className="data" style={{ marginTop: 10 }}><tbody>
+          {v.submodels.map((m, i) => <tr key={i}><th scope="row">{m.name}</th><td className="muted">{m.target}</td><td>{m.metric}</td><td className="r num">{m.value}</td></tr>)}
+        </tbody></table></div>
       )}
       {v?.notes && <p className="muted small">{v.notes}</p>}
     </>
@@ -63,10 +63,10 @@ function ValidationTables({ v }: { v: Validation }) {
 }
 
 export default function MethodologyPage() {
-  const { t, d } = useLang();
+  const { t, d, lang } = useLang();
   const { data } = useApi<Methodology>("/methodology");
   const { data: stadiums } = useApi<Stadium[]>("/stadiums");
-  if (!data) return <main className="page"><div className="empty-state">{t("loading")}</div></main>;
+  if (!data) return <main className="page" aria-busy="true"><div className="skel skel-line" /><div className="skel skel-card" /></main>;
   const v = data.validation;
   const b = data.bayesball;
 
@@ -135,7 +135,7 @@ export default function MethodologyPage() {
         <section className="panel">
           <h2>{t("mData")}</h2>
           <div className="stats-row" style={{ marginTop: 10 }}>
-            <div className="stat"><span className="v num">{data.data.rows?.toLocaleString()}</span><span className="l">{t("mDataRows")}</span></div>
+            <div className="stat"><span className="v num">{data.data.rows != null ? fmtInt(lang, data.data.rows) : "–"}</span><span className="l">{t("mDataRows")}</span></div>
             <div className="stat"><span className="v num">{data.data.seasons?.join(", ")}</span><span className="l">{t("season")}</span></div>
           </div>
           <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginTop: 12 }}>

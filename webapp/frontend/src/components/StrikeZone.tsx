@@ -24,7 +24,7 @@ type Props = {
   visible: Set<string>;
   aim: { x: number; z: number };
   onAim: (x: number, z: number) => void;
-  labels: { sea: string; here: string };
+  labels: { sea: string; here: string; aim?: string };
 };
 
 export function StrikeZone({ pitches, visible, aim, onAim, labels }: Props) {
@@ -49,7 +49,19 @@ export function StrikeZone({ pitches, visible, aim, onAim, labels }: Props) {
 
   return (
     <>
-    <svg ref={ref} className="zone-svg" viewBox={`0 0 ${W} ${H}`} onClick={click} role="img">
+    <svg ref={ref} className="zone-svg" viewBox={`0 0 ${W} ${H}`} onClick={click} role="img" tabIndex={0}
+      aria-label={labels.aim ?? undefined}
+      onKeyDown={(e) => {
+        // Flechas: mueven el punto de apunte 1 pulgada (alternativa al clic).
+        const step = 1 / 12;
+        const d: Record<string, [number, number]> = { ArrowLeft: [-step, 0], ArrowRight: [step, 0], ArrowUp: [0, step], ArrowDown: [0, -step] };
+        const m = d[e.key];
+        if (!m) return;
+        e.preventDefault();
+        const x = Math.max(-1.6, Math.min(1.6, aim.x + m[0]));
+        const z = Math.max(0.6, Math.min(4.4, aim.z + m[1]));
+        onAim(Math.round(x * 100) / 100, Math.round(z * 100) / 100);
+      }}>
       <defs>
         <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
           <path d="M0 0 L10 5 L0 10 z" fill="var(--chalk)" />
