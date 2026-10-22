@@ -134,9 +134,9 @@ export function FreeAgentTable({ compact = false }: { compact?: boolean }) {
       {!compact && medians && (
         <p className="fa-rule">
           {noStaff
-            ? t("faNoStaffNote", { n: FA_RULES.minPitches })
-            : t("faRuleNote", { a: `+${FA_RULES.fitSign}` })}{" "}
-          <Term k="stuff">{t("whatIsStuff")}</Term>
+            ? t("faNoStaffNote")
+            : t("faRuleNote")}{" "}
+          <Term k={noStaff ? "signNoStaff" : "signFit"} vars={{ n: FA_RULES.minPitches, a: `+${FA_RULES.fitSign}` }}>{t("whatIsVerdict")}</Term>
         </p>
       )}
 
