@@ -4,7 +4,7 @@ import type { FeatureCollection } from "geojson";
 import { useNavigate } from "react-router-dom";
 import mexico from "../mexico-states.json";
 import type { Stadium } from "../api";
-import { useLang } from "../i18n";
+import { fmtInt, useLang } from "../i18n";
 import { altitudeColor, fmt } from "../state";
 
 const W = 960;
@@ -19,7 +19,7 @@ const LABEL: Record<string, [number, number, "start" | "end" | "middle"]> = {
 };
 
 export function MexicoMap({ stadiums, highlightId }: { stadiums: Stadium[]; highlightId?: string | null }) {
-  const { t } = useLang();
+  const { t, lang } = useLang();
   const navigate = useNavigate();
   const [hover, setHover] = useState<Stadium | null>(null);
   const { path, project } = useMemo(() => {
@@ -66,7 +66,7 @@ export function MexicoMap({ stadiums, highlightId }: { stadiums: Stadium[]; high
           <div style={{ fontFamily: "var(--display)", fontWeight: 700, fontSize: 19, lineHeight: 1.1, textTransform: "uppercase" }}>{hover.venue_name}</div>
           <div className="muted small">{hover.city}</div>
           <div className="stats-row" style={{ marginTop: 8, gap: 18 }}>
-            <div className="stat"><span className="v num" style={{ fontSize: 20, color: altitudeColor(hover.altitude_m) }}>{hover.altitude_m.toLocaleString()} m</span><span className="l">{t("altitude")}</span></div>
+            <div className="stat"><span className="v num" style={{ fontSize: 20, color: altitudeColor(hover.altitude_m) }}>{fmtInt(lang, hover.altitude_m)} m</span><span className="l">{t("altitude")}</span></div>
             <div className="stat"><span className="v num" style={{ fontSize: 20 }}>{fmt(hover.movement_retained_pct, 0)}%</span><span className="l">{t("movementRetained")}</span></div>
           </div>
         </div>
