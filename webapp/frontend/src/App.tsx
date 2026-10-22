@@ -1,6 +1,8 @@
 import { useEffect, useRef } from "react";
 import { Navigate, NavLink, Route, Routes, useLocation } from "react-router-dom";
+import { InstallHint, OfflineBanner } from "./components/AppNotices";
 import { BottomNav } from "./components/BottomNav";
+import { IntroVideo } from "./components/IntroVideo";
 import { Diablo } from "./components/Diablo";
 import { useLang } from "./i18n";
 import { useAppState } from "./state";
@@ -22,7 +24,7 @@ export default function App() {
       <a href="#main" className="skip-link">{t("skipToContent")}</a>
       <header className="topbar">
         <NavLink to="/" className="brand" aria-label={t("appName")}>
-          <Diablo size={30} still />
+          <Diablo size={30} />
           <span>Diablos Stuff<span className="plus">+</span></span>
         </NavLink>
         <nav className="nav nav-desktop" aria-label={t("mainNav")}>
@@ -41,6 +43,7 @@ export default function App() {
         <MoreMenu />
       </header>
       {meta?.synthetic && <div className="banner">{t("syntheticBanner")}</div>}
+      <OfflineBanner />
       <div id="main" tabIndex={-1} className="route" key={pathname}>
         <Routes>
           <Route path="/" element={<TodayPage />} />
@@ -53,7 +56,10 @@ export default function App() {
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </div>
+      {/* el aviso de instalación va al final: si aparece tarde (Android), no empuja el contenido */}
+      <InstallHint />
       <BottomNav />
+      <IntroVideo />
     </>
   );
 }

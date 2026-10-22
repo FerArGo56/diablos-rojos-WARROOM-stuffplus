@@ -1,5 +1,7 @@
 import type { Methodology, Stadium, Validation } from "../api";
+import { LoopVideo } from "../components/LoopVideo";
 import { fmtInt, useLang } from "../i18n";
+import { VIDEO } from "../media";
 import { altitudeColor, fmt, useApi } from "../state";
 
 function AltitudeChart({ data, stadiums }: { data: Methodology["altitude_study"]; stadiums: Stadium[] }) {
@@ -108,6 +110,7 @@ export default function MethodologyPage() {
         <section className="panel">
           <h2>{t("mAltitude")}</h2>
           <p className="muted">{t("mAltitudeText")}</p>
+          <LoopVideo {...VIDEO.giroLento} className="m-video" />
           {data.altitude_study.rows.length > 0 && stadiums && <AltitudeChart data={data.altitude_study} stadiums={stadiums} />}
           {data.altitude_study.elasticity_spin_vs_density != null && (
             <div className="stat" style={{ marginTop: 8 }}>

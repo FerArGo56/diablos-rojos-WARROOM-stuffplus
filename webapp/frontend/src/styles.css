@@ -47,6 +47,9 @@
 
   /* sombras teñidas del rojo de fondo, no negro puro */
   --shadow-1: 0 1px 0 rgba(255, 255, 255, 0.04) inset, 0 10px 28px rgba(28, 4, 9, 0.5);
+  /* luz roja tenue: solo la tarjeta principal (la del veredicto) de cada pantalla */
+  --glow-border: color-mix(in srgb, var(--red) 45%, var(--line));
+  --glow: 0 0 0 1px rgba(213, 16, 47, 0.12), 0 12px 40px -12px rgba(213, 16, 47, 0.45), 0 1px 0 rgba(255, 255, 255, 0.04) inset;
 
   /* movimiento */
   --dur-fast: 150ms;
@@ -59,6 +62,7 @@
   --z-overlay: 50;
   --z-dialog: 51;
   --z-tooltip: 60;
+  --z-intro: 100;
   --bottomnav-h: 60px;
 }
 
@@ -75,6 +79,11 @@ body {
   font-size: 15px;
   line-height: 1.45;
   -webkit-font-smoothing: antialiased;
+}
+/* grano muy sutil: capa fija, sin eventos, detrás del contenido (no repinta al hacer scroll) */
+body::before {
+  content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none; opacity: 0.05;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.6 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 html { -webkit-tap-highlight-color: transparent; }
 a { color: inherit; text-decoration: none; }
@@ -324,7 +333,7 @@ table.data td.r, table.data th.r { text-align: right; }
 .today > section { min-width: 0; }
 .section-label { font-size: var(--fs-sm); font-weight: 800; letter-spacing: 0.1em; color: var(--muted); margin-bottom: var(--sp-2); }
 
-.scorebug { position: relative; overflow: hidden; background: linear-gradient(180deg, var(--panel), var(--bg-2)); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow-1); }
+.scorebug { position: relative; overflow: hidden; background: linear-gradient(180deg, var(--panel), var(--bg-2)); border: 1px solid var(--line); border-radius: var(--radius); }
 .scorebug::before { content: ""; position: absolute; inset: 0 auto 0 0; width: 4px; background: var(--red); }
 .sb-meta { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-3); flex-wrap: wrap; padding: var(--sp-3) var(--sp-4) 0 calc(var(--sp-4) + 4px); font-size: var(--fs-sm); color: var(--muted); }
 .sb-meta time::first-letter { text-transform: uppercase; }
@@ -543,3 +552,80 @@ table.data tbody th { text-transform: none; font-family: var(--body); font-size:
 }
 .search-box input::-webkit-search-cancel-button { filter: invert(0.7); cursor: pointer; }
 .cal-month { min-width: 110px; text-align: center; font-size: var(--fs-md); letter-spacing: 0.01em; font-weight: 700; }
+
+/* tarjeta principal de cada pantalla: Hoy (marcador), ¿Y si…? (veredicto), Estadio (lanzador elegido),
+   Lanzador (decisión en el Harp Helú) */
+.scorebug, .panel.wi-verdict, .panel.sel-pitcher, .panel.decision { border-color: var(--glow-border); box-shadow: var(--glow); }
+
+/* ------------------------------------------------------------ PWA: avisos */
+@media (display-mode: standalone) { .topbar { padding-top: max(8px, env(safe-area-inset-top)); } }
+.notice { display: flex; align-items: center; justify-content: center; gap: var(--sp-3); padding: 8px 16px; font-size: var(--fs-sm); text-align: center; border-bottom: 1px solid var(--line); }
+.notice.offline { background: #2a1a08; color: var(--gold); font-weight: 600; }
+.notice.install { background: var(--panel); color: var(--text); justify-content: space-between; text-align: left; }
+.notice.install .btn { flex: none; }
+.notice-close { flex: none; background: none; border: 0; color: var(--muted); width: var(--tap); height: var(--tap); border-radius: 50%; }
+.notice-close:hover { color: var(--text); background: var(--panel-2); }
+.ptr { height: 0; opacity: 0; overflow: hidden; display: flex; align-items: center; justify-content: center; font-size: var(--fs-sm); color: var(--muted); margin-bottom: calc(-1 * var(--sp-3)); }
+.stamp-refresh { margin-left: var(--sp-3); background: none; border: 0; padding: 4px 0; font: inherit; color: var(--muted); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+.stamp-refresh:hover { color: var(--text); }
+.stamp-refresh[disabled] { text-decoration: none; cursor: default; }
+/* área táctil de 44 px sin hacer más alta la línea: relleno + margen negativo */
+@media (pointer: coarse) { .stamp-refresh { padding: 14px 8px; margin-block: -14px; margin-right: -8px; } }
+
+/* mascota del club: la imagen ya trae su forma, sin fondo */
+.mascota { display: block; flex: none; }
+.mascota-cuerpo { width: auto; }
+
+/* ------------------------------------------------------------ video en bucle (etapa 2) */
+.loop-video { position: relative; width: 100%; border-radius: var(--radius); overflow: hidden; background: var(--panel); border: 1px solid var(--line); }
+.loop-video video { display: block; width: 100%; height: 100%; object-fit: cover; }
+.loop-video-btn { position: absolute; right: var(--sp-3); bottom: var(--sp-3); width: var(--tap); height: var(--tap); border-radius: 50%; border: 1px solid rgba(255, 255, 255, 0.25); background: rgba(11, 11, 13, 0.7); display: grid; place-items: center; }
+.loop-video-btn:hover { background: rgba(11, 11, 13, 0.9); }
+/* ícono con CSS: triángulo = reproducir; dos barras = pausar */
+.loop-video-btn span { width: 14px; height: 16px; background: var(--text); clip-path: polygon(15% 0, 100% 50%, 15% 100%); }
+.loop-video-btn.is-playing span { clip-path: polygon(0 0, 35% 0, 35% 100%, 0 100%, 0 0, 65% 0, 100% 0, 100% 100%, 65% 100%, 65% 0); }
+
+/* ------------------------------------------------------------ intro a pantalla completa */
+.intro { position: fixed; inset: 0; z-index: var(--z-intro); background: #000; opacity: 1; transition: opacity 300ms var(--ease-out); cursor: pointer; }
+.intro.is-leaving { opacity: 0; pointer-events: none; }
+.intro video { width: 100%; height: 100%; object-fit: cover; display: block; }
+.intro-skip { position: absolute; right: max(16px, env(safe-area-inset-right)); bottom: max(20px, env(safe-area-inset-bottom)); min-height: var(--tap); padding: 0 18px; border-radius: 999px; border: 1px solid rgba(255, 255, 255, 0.4); background: rgba(11, 11, 13, 0.55); color: #fff; font-family: var(--display); font-weight: 800; font-size: 15px; letter-spacing: 0.06em; text-transform: uppercase; backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
+.intro-skip:hover { background: rgba(11, 11, 13, 0.8); }
+
+/* ------------------------------------------------------------ trayectorias en 3D */
+.zone-hint { margin: calc(-1 * var(--sp-2)) 0 var(--sp-2); }
+.pitch3d { display: flex; flex-direction: column; flex: 1; }
+.pitch3d-svg { cursor: grab; touch-action: pan-y; border-radius: var(--radius-sm); background: radial-gradient(ellipse at 50% 70%, rgba(42, 27, 18, 0.35), transparent 70%); }
+.pitch3d-svg:active { cursor: grabbing; }
+.pitch3d-bar { display: flex; align-items: center; gap: var(--sp-2) var(--sp-3); flex-wrap: wrap; margin-top: var(--sp-2); }
+.pitch3d-legend { display: inline-flex; align-items: center; gap: 6px; margin-right: auto; }
+/* las zonas interactivas (2D y 3D) solo muestran el foco con teclado, con el rojo de la app */
+.zone-svg:focus { outline: none; }
+.zone-svg:focus-visible { outline: 2px solid var(--red-2); outline-offset: 2px; }
+.pitch3d-bar > .faint { flex-basis: 100%; }
+
+/* ------------------------------------------------------------ videos (etapa 2) */
+/* Explorar: el lanzamiento de fondo del encabezado, oscurecido para leer el título y el buscador */
+/* se recorta solo el video (no el encabezado): la lista del buscador puede salir del encabezado */
+.loop-video-background { position: absolute; inset: 0; z-index: 0; border: 0; border-radius: inherit; overflow: hidden; }
+.loop-video-background video { object-position: center 35%; } /* en encabezados anchos y bajos, que se vea el lanzador de la gorra a los muslos */
+.loop-video-background::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(90deg, rgba(11,11,13,.92) 0%, rgba(11,11,13,.75) 45%, rgba(11,11,13,.45) 100%), linear-gradient(0deg, rgba(11,11,13,.85) 0%, transparent 50%); }
+.loop-video-background .loop-video-btn { z-index: 2; }
+.hero:has(.loop-video) { position: relative; border-radius: var(--radius); padding: var(--sp-6) var(--sp-5); min-height: 260px; align-items: flex-end; }
+.hero:has(.loop-video) > :not(.loop-video) { position: relative; z-index: 1; }
+
+/* ¿Y si…?: el pitcher genérico junto al buscador (arriba en celular, a 40% de la pantalla como máximo) */
+.wi-empty { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--sp-4); }
+.wi-empty-main { display: flex; flex-direction: column; gap: var(--sp-5); min-width: 0; }
+.wi-pitcher { max-height: 40vh; width: auto; justify-self: center; }
+@media (min-width: 768px) {
+  .wi-empty:has(.wi-pitcher) { grid-template-columns: minmax(220px, 300px) minmax(0, 1fr); align-items: start; }
+  .wi-pitcher { max-height: none; width: 100%; }
+}
+
+/* Metodología: el giro lento junto a la explicación de la altitud */
+.m-video { margin: var(--sp-3) 0; }
+.loop-video-background .loop-video-btn { top: var(--sp-3); bottom: auto; }
+/* aviso de instalación al final de la página: arriba de la barra inferior en celular */
+.notice.install { margin: 0 auto var(--sp-4); max-width: 1320px; border: 1px solid var(--line); border-radius: var(--radius); }
+@media (max-width: 767px) { .notice.install { margin: 0 var(--sp-4) calc(var(--bottomnav-h) + env(safe-area-inset-bottom) + var(--sp-3)); } }

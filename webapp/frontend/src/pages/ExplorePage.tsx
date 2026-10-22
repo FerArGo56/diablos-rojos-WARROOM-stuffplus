@@ -5,6 +5,8 @@ import { MexicoMap } from "../components/MexicoMap";
 import { ScheduleCalendar } from "../components/ScheduleCalendar";
 import { SearchBox } from "../components/SearchBox";
 import { Link } from "react-router-dom";
+import { LoopVideo } from "../components/LoopVideo";
+import { VIDEO } from "../media";
 import { fmtInt, useLang } from "../i18n";
 import { altitudeColor, useApi } from "../state";
 
@@ -18,6 +20,7 @@ export default function ExplorePage() {
   return (
     <main className="page">
       <section className="hero">
+        <LoopVideo {...VIDEO.lanzamiento} variant="background" />
         <div>
           <div className="eyebrow">Liga Mexicana de Beisbol · Stuff+</div>
           <h1>{t("mapTitle")}</h1>
