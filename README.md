@@ -1,6 +1,6 @@
 # Stuff+ ajustado por altitud — Diablos Rojos del México
 
-**Hackathon ISAC 2026.** Un modelo que califica cada pitcheo de la Liga Mexicana de Beisbol y mide cuánto cambia su calidad en la altitud del Estadio Alfredo Harp Helú (CDMX, 2,232 m).
+**Hackathon ISAC 2026.** Un modelo que califica cada pitcheo de la Liga Mexicana de Beisbol y mide cuánto cambia su calidad en la altitud del Estadio Alfredo Harp Helú (CDMX, 2,240 m).
 
 > **Escala:** `Stuff+ = 100 + 10 × z(score)`. 100 es el promedio de la LMB y cada 10 puntos es una desviación estándar.
 
