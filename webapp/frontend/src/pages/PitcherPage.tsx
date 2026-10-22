@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import type { Profile, Stadium } from "../api";
+import { Term } from "../components/Term";
 import { PITCH_NAMES, useLang } from "../i18n";
 import { PITCH_COLORS, altitudeColor, fmt, stuffColor, useApi, useAppState } from "../state";
 
@@ -56,9 +57,9 @@ export default function PitcherPage() {
           <table className="data">
             <thead><tr>
               <th></th><th className="r">{t("usage")}</th><th className="r">{t("velo")}</th><th className="r">{t("spin")}</th>
-              <th className="r">IVB</th><th className="r">HB</th><th className="r">{t("whiff")}</th>
-              {bayes && <th className="r">{t("bayesWhiff")}<br /><span className="faint tiny">{t("bayesWhiffSub")}</span></th>}
-              <th className="r">Stuff+ {t("neutral")}</th><th className="r">{t("bestPark")}</th><th className="r">{t("worstPark")}</th>
+              <th className="r"><Term k="ivb">{t("ivbShort")}</Term></th><th className="r"><Term k="hb">{t("hbShort")}</Term></th><th className="r"><Term k="whiff">{t("whiffShort")}</Term></th>
+              {bayes && <th className="r"><Term k="whiff">{t("bayesWhiff")}</Term><br /><span className="faint tiny">{t("bayesWhiffSub")}</span></th>}
+              <th className="r"><Term k="stuff">Stuff+</Term> {t("neutral")}</th><th className="r">{t("bestPark")}</th><th className="r">{t("worstPark")}</th>
             </tr></thead>
             <tbody>
               {data.arsenal.map((a) => (
@@ -87,7 +88,7 @@ export default function PitcherPage() {
               ))}
             </tbody>
           </table>
-          <p className="faint tiny">IVB / HB: {t("seaLevel")}, in{bayes ? ` · ${t("bayesFoot")}` : ""}</p>
+          <p className="faint tiny">{t("ivbShort")} / {t("hbShort")}: {t("seaLevel")}, in{bayes ? ` · ${t("bayesFoot")}` : ""}</p>
         </div>
       </section>
 

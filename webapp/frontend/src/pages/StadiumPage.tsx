@@ -5,6 +5,7 @@ import { CrownIcon, Leaderboard } from "../components/Leaderboard";
 import { MovementPlot } from "../components/MovementPlot";
 import { SearchBox } from "../components/SearchBox";
 import { StrikeZone } from "../components/StrikeZone";
+import { Term } from "../components/Term";
 import { PITCH_NAMES, useLang } from "../i18n";
 import { PITCH_COLORS, altitudeColor, fmt, signed, stuffColor, useApi } from "../state";
 
@@ -71,8 +72,8 @@ export default function StadiumPage() {
               <Link to={`/lanzador/${pid}`} className="muted small" style={{ textDecoration: "underline" }}>{t("profileLink")} →</Link>
             </div>
             <div className="stats-row">
-              <div className="stat"><span className="v num" style={{ color: stuffColor(proj.pitcher.stuff_here) }}>{fmt(proj.pitcher.stuff_here)}</span><span className="l">Stuff+ {t("here")}</span></div>
-              <div className="stat"><span className="v num muted">{fmt(proj.pitcher.stuff_sea)}</span><span className="l">Stuff+ {t("seaLevel")}</span></div>
+              <div className="stat"><span className="v num" style={{ color: stuffColor(proj.pitcher.stuff_here) }}>{fmt(proj.pitcher.stuff_here)}</span><span className="l"><Term k="stuff">Stuff+</Term> {t("here")}</span></div>
+              <div className="stat"><span className="v num muted">{fmt(proj.pitcher.stuff_sea)}</span><span className="l"><Term k="stuff">Stuff+</Term> {t("seaLevel")}</span></div>
             </div>
           </section>
 
@@ -95,8 +96,8 @@ export default function StadiumPage() {
               <div className="table-wrap" style={{ marginTop: 10 }}>
                 <table className="data">
                   <thead><tr>
-                    <th></th><th className="r">{t("velo")}</th><th className="r">IVB</th><th className="r">HB</th>
-                    <th className="r">{t("plateSpeed")}</th><th className="r">Stuff+</th>
+                    <th></th><th className="r">{t("velo")}</th><th className="r"><Term k="ivb">{t("ivbShort")}</Term></th><th className="r"><Term k="hb">{t("hbShort")}</Term></th>
+                    <th className="r">{t("plateSpeed")}</th><th className="r"><Term k="stuff">Stuff+</Term></th>
                   </tr></thead>
                   <tbody>
                     {proj.pitches.filter((p) => visible.has(p.pitch_type)).map((p) => (
@@ -121,7 +122,7 @@ export default function StadiumPage() {
       )}
 
       <section className="panel" style={{ marginTop: 18 }}>
-        <div className="panel-head"><h3>{t("leagueHere")}</h3><span className="faint tiny">IVB · HB (in)</span></div>
+        <div className="panel-head"><h3>{t("leagueHere")}</h3><span className="faint tiny"><Term k="ivb">{t("ivbShort")}</Term> · <Term k="hb">{t("hbShort")}</Term> (in)</span></div>
         {st.league_by_pitch_type.map((r) => (
           <div key={r.pitch_type}>
             {(["ivb", "hb"] as const).map((k) => {
@@ -129,7 +130,7 @@ export default function StadiumPage() {
               const here = k === "ivb" ? r.ivb_here : r.hb_here;
               return (
                 <div className="bar-row" key={k}>
-                  <span style={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{k === "ivb" ? <><span className="dot" style={{ background: PITCH_COLORS[r.pitch_type], marginRight: 6 }} />{PITCH_NAMES[lang][r.pitch_type]} <span className="faint">IVB</span></> : <span className="faint" style={{ paddingLeft: 16 }}>HB</span>}</span>
+                  <span style={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{k === "ivb" ? <><span className="dot" style={{ background: PITCH_COLORS[r.pitch_type], marginRight: 6 }} />{PITCH_NAMES[lang][r.pitch_type]} <span className="faint">{t("ivbShort")}</span></> : <span className="faint" style={{ paddingLeft: 16 }}>{t("hbShort")}</span>}</span>
                   <div className="bar-track">
                     <div className="bar-fill" style={{ left: "50%", width: `${(Math.abs(sea) / maxAbs) * 50}%`, background: "transparent", border: `1px dashed ${PITCH_COLORS[r.pitch_type]}`, transform: sea < 0 ? "translateX(-100%)" : undefined }} />
                     <div className="bar-fill" style={{ left: "50%", width: `${(Math.abs(here) / maxAbs) * 50}%`, background: PITCH_COLORS[r.pitch_type], opacity: 0.85, transform: here < 0 ? "translateX(-100%)" : undefined }} />
