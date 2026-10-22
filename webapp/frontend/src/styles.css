@@ -608,6 +608,7 @@ table.data tbody th { text-transform: none; font-family: var(--body); font-size:
 /* Explorar: el lanzamiento de fondo del encabezado, oscurecido para leer el título y el buscador */
 /* se recorta solo el video (no el encabezado): la lista del buscador puede salir del encabezado */
 .loop-video-background { position: absolute; inset: 0; z-index: 0; border: 0; border-radius: inherit; overflow: hidden; }
+.loop-video-background video { object-position: center 35%; } /* en encabezados anchos y bajos, que se vea el lanzador de la gorra a los muslos */
 .loop-video-background::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(90deg, rgba(11,11,13,.92) 0%, rgba(11,11,13,.75) 45%, rgba(11,11,13,.45) 100%), linear-gradient(0deg, rgba(11,11,13,.85) 0%, transparent 50%); }
 .loop-video-background .loop-video-btn { z-index: 2; }
 .hero:has(.loop-video) { position: relative; border-radius: var(--radius); padding: var(--sp-6) var(--sp-5); min-height: 260px; align-items: flex-end; }
