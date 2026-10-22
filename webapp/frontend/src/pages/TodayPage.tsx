@@ -122,7 +122,7 @@ export default function TodayPage() {
         <h2 id="bullpen-title" className="section-label">{t("yourBullpen")}</h2>
         {bp.relievers.length > 0 ? <BullpenList data={bp} scale={scale} /> : (
           <div className="empty-note">
-            <Diablo size={44} still />
+            <Diablo size={88} full />
             <p>{t("bullpenEmpty")}</p>
           </div>
         )}
@@ -135,7 +135,7 @@ function EmptyNote({ text, onRetry }: { text: string; onRetry?: () => void }) {
   const { t } = useLang();
   return (
     <div className="empty-note">
-      <Diablo size={44} still />
+      <Diablo size={88} full />
       <div>
         <p>{text}</p>
         {onRetry && <button type="button" className="btn" onClick={onRetry} style={{ marginRight: 8 }}>{t("retry")}</button>}

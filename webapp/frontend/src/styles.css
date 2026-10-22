@@ -570,3 +570,7 @@ table.data tbody th { text-transform: none; font-family: var(--body); font-size:
 .stamp-refresh[disabled] { text-decoration: none; cursor: default; }
 /* área táctil de 44 px sin hacer más alta la línea: relleno + margen negativo */
 @media (pointer: coarse) { .stamp-refresh { padding: 14px 8px; margin-block: -14px; margin-right: -8px; } }
+
+/* mascota del club: la imagen ya trae su forma, sin fondo */
+.mascota { display: block; flex: none; }
+.mascota-cuerpo { width: auto; }
