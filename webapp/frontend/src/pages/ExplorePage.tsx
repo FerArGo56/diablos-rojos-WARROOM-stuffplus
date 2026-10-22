@@ -40,8 +40,8 @@ export default function ExplorePage() {
           )}
           {alt.length > 0 && (
             <div className="stats-row" style={{ marginTop: 14, borderTop: "1px solid var(--line)", paddingTop: 14 }}>
-              <div className="stat"><span className="v num">{alt[0].altitude_m.toLocaleString()} m</span><span className="l">{alt[0].team_code} · {t("altitude")}</span></div>
-              <div className="stat"><span className="v num">{alt[alt.length - 1].altitude_m} m</span><span className="l">{alt[alt.length - 1].team_code} · {t("altitude")}</span></div>
+              <div className="stat"><span className="v num">{fmtInt(lang, alt[0].altitude_m)} m</span><span className="l">{alt[0].team_code} · {t("altitude")}</span></div>
+              <div className="stat"><span className="v num">{fmtInt(lang, alt[alt.length - 1].altitude_m)} m</span><span className="l">{alt[alt.length - 1].team_code} · {t("altitude")}</span></div>
               <div className="stat"><span className="v num" style={{ color: "var(--red-2)" }}>{Math.round(100 - alt[0].movement_retained_pct)}%</span><span className="l">{alt[0].team_code} · {t("movementLost")}</span></div>
             </div>
           )}

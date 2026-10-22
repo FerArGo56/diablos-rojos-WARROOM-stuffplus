@@ -446,7 +446,7 @@ table.data td.r, table.data th.r { text-align: right; }
 .wi-staff p { margin: 0; }
 @media (max-width: 767px) {
   .wi { gap: var(--sp-4); }
-  .wi-controls, .wi-grid { grid-template-columns: 1fr; }
+  .wi-controls, .wi-grid { grid-template-columns: minmax(0, 1fr); }
   .wi-score { align-items: flex-start; text-align: left; }
 }
 table.data tbody th { text-transform: none; font-family: var(--body); font-size: 14px; letter-spacing: 0; color: var(--text); padding: 8px; border-bottom: 1px solid var(--line); }
@@ -537,3 +537,5 @@ table.data tbody th { text-transform: none; font-family: var(--body); font-size:
   .map-svg .label { font-size: 26px; }
   .map-svg .stadium circle { stroke-width: 2; }
 }
+.search-box input::-webkit-search-cancel-button { filter: invert(0.7); cursor: pointer; }
+.cal-month { min-width: 110px; text-align: center; font-size: var(--fs-md); letter-spacing: 0.01em; font-weight: 700; }

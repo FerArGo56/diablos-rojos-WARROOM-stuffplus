@@ -1,18 +1,19 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { api, type SearchResult } from "../api";
-import { useLang } from "../i18n";
+import { fmtInt, useLang } from "../i18n";
 
 type Props = { pitchersOnly?: boolean; onPickPitcher?: (id: string) => void; placeholder?: string; autoFocus?: boolean };
 
 export function SearchBox({ pitchersOnly, onPickPitcher, placeholder, autoFocus }: Props) {
-  const { t } = useLang();
+  const { t, lang } = useLang();
   const navigate = useNavigate();
   const [q, setQ] = useState("");
   const [res, setRes] = useState<SearchResult | null>(null);
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState(0);
   const boxRef = useRef<HTMLDivElement>(null);
+  const listId = useId();
 
   useEffect(() => {
     if (!q.trim()) { setRes(null); return; }
@@ -42,6 +43,9 @@ export function SearchBox({ pitchersOnly, onPickPitcher, placeholder, autoFocus 
       <label className="search-box">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" /><path d="m20 20-4.8-4.8" strokeLinecap="round" /></svg>
         <input
+          type="search" name="q" autoComplete="off" spellCheck={false}
+          role="combobox" aria-autocomplete="list" aria-expanded={!!(open && q.trim() && res)} aria-controls={listId}
+          aria-activedescendant={open && items[active] ? `${listId}-${active}` : undefined}
           value={q} autoFocus={autoFocus} placeholder={placeholder ?? t("searchPlaceholder")} aria-label={placeholder ?? t("searchPlaceholder")}
           onChange={(e) => { setQ(e.target.value); setOpen(true); setActive(0); }}
           onFocus={() => setOpen(true)}
@@ -54,22 +58,22 @@ export function SearchBox({ pitchersOnly, onPickPitcher, placeholder, autoFocus 
         />
       </label>
       {open && q.trim() && res && (
-        <div className="search-results">
-          {items.length === 0 && <div className="muted small" style={{ padding: 8 }}>{t("noResults")}</div>}
-          {res.pitchers.length > 0 && <div className="grp">{t("searchPitchers")}</div>}
+        <div className="search-results" id={listId} role="listbox">
+          {items.length === 0 && <div className="muted small" style={{ padding: 8 }} role="status">{t("noResults")}</div>}
+          {res.pitchers.length > 0 && <div className="grp" role="presentation">{t("searchPitchers")}</div>}
           {res.pitchers.map((p, i) => (
-            <button key={p.pitcher_id} className={`item ${active === i ? "active" : ""}`} onClick={() => pick("p", p.pitcher_id)}>
+            <button key={p.pitcher_id} type="button" id={`${listId}-${i}`} role="option" aria-selected={active === i} tabIndex={-1} className={`item ${active === i ? "active" : ""}`} onClick={() => pick("p", p.pitcher_id)}>
               <span className="num">{p.name}</span>
               <span className="chip">{p.role === "SP" ? t("sp") : t("rp")} · {p.throws === "Right" ? "R" : "L"}</span>
               <span className={`chip ${p.status === "FA" ? "gold" : ""}`} style={{ marginLeft: "auto" }}>{statusLabel(p.status)}</span>
             </button>
           ))}
-          {!pitchersOnly && res.stadiums.length > 0 && <div className="grp">{t("searchStadiums")}</div>}
+          {!pitchersOnly && res.stadiums.length > 0 && <div className="grp" role="presentation">{t("searchStadiums")}</div>}
           {!pitchersOnly && res.stadiums.map((s, j) => (
-            <button key={s.id} className={`item ${active === res.pitchers.length + j ? "active" : ""}`} onClick={() => pick("s", s.id)}>
+            <button key={s.id} type="button" id={`${listId}-${res.pitchers.length + j}`} role="option" aria-selected={active === res.pitchers.length + j} tabIndex={-1} className={`item ${active === res.pitchers.length + j ? "active" : ""}`} onClick={() => pick("s", s.id)}>
               <span>{s.venue_name}</span>
               <span className="muted small">{s.city}</span>
-              <span className="chip num" style={{ marginLeft: "auto" }}>{s.altitude_m.toLocaleString()} m</span>
+              <span className="chip num" style={{ marginLeft: "auto" }}>{fmtInt(lang, s.altitude_m)} m</span>
             </button>
           ))}
         </div>

@@ -111,7 +111,7 @@ export default function StadiumPage() {
           <div className="stadium-grid">
             <section className="panel zone-panel">
               <div className="panel-head"><h3>{t("strikeZoneTitle")}</h3><span className="faint tiny">{t("aimHint")}</span></div>
-              <StrikeZone pitches={ready.pitches} visible={visible} aim={aim} onAim={(x, z) => setAim({ x, z })} labels={{ sea: t("seaLevel"), here: st.venue_name }} />
+              <StrikeZone pitches={ready.pitches} visible={visible} aim={aim} onAim={(x, z) => setAim({ x, z })} labels={{ sea: t("seaLevel"), here: st.venue_name, aim: `${t("strikeZoneTitle")}. ${t("aimHint")}` }} />
             </section>
             <section className="panel">
               <div className="panel-head"><h3>{t("movementTitle")}</h3></div>

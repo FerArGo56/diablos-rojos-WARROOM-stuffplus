@@ -1,14 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import type { Game, Schedule } from "../api";
-import { useLang } from "../i18n";
+import { fmtDate, fmtInt, useLang } from "../i18n";
 import { useApi, useAppState } from "../state";
 import { Diablo } from "./Diablo";
 
-const MONTHS = {
-  es: ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"],
-  en: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
-};
 const DOW = { es: ["L", "M", "M", "J", "V", "S", "D"], en: ["M", "T", "W", "T", "F", "S", "S"] };
 
 export function ScheduleCalendar({ onHighlight }: { onHighlight?: (stadiumId: string | null) => void }) {
@@ -43,6 +39,7 @@ export function ScheduleCalendar({ onHighlight }: { onHighlight?: (stadiumId: st
   if (!data) return <div className="skel skel-card" aria-busy="true" />;
   if (!month) return null;
   const [y, m] = month.split("-").map(Number);
+  const monthName = (ym: string) => { const n = fmtDate(lang, `${ym}-01`, { month: "long" }); return n.charAt(0).toUpperCase() + n.slice(1); };
   const first = new Date(y, m - 1, 1);
   const offset = (first.getDay() + 6) % 7;
   const days = new Date(y, m, 0).getDate();
@@ -57,9 +54,9 @@ export function ScheduleCalendar({ onHighlight }: { onHighlight?: (stadiumId: st
           {data.record && <div className="muted small">{t("record")} <span className="num">{data.record.w}-{data.record.l}</span></div>}
         </div>
         <div className="cal-head" style={{ gap: 6, margin: 0 }}>
-          <button className="btn" style={{ padding: "4px 10px" }} disabled={idx <= 0} onClick={() => setMonth(months[idx - 1])} aria-label={MONTHS[lang][(m + 10) % 12]}>‹</button>
-          <h3 style={{ minWidth: 110, textAlign: "center" }}>{MONTHS[lang][m - 1]}</h3>
-          <button className="btn" style={{ padding: "4px 10px" }} disabled={idx >= months.length - 1} onClick={() => setMonth(months[idx + 1])} aria-label={MONTHS[lang][m % 12]}>›</button>
+          <button className="btn" style={{ padding: "4px 10px" }} disabled={idx <= 0} onClick={() => setMonth(months[idx - 1])} aria-label={monthName(months[idx - 1] ?? month)}>‹</button>
+          <h2 className="cal-month">{monthName(month)}</h2>
+          <button className="btn" style={{ padding: "4px 10px" }} disabled={idx >= months.length - 1} onClick={() => setMonth(months[idx + 1])} aria-label={monthName(months[idx + 1] ?? month)}>›</button>
         </div>
       </div>
       <div className="cal-grid">
@@ -87,7 +84,7 @@ export function ScheduleCalendar({ onHighlight }: { onHighlight?: (stadiumId: st
           <div>
             <div style={{ fontWeight: 600 }}>{selGames[0].home ? `${t("vs")} ` : `@ `}{selGames[0].opponent_name}</div>
             <div className="muted small">
-              <Link to={`/estadio/${selGames[0].stadium_id}`} style={{ textDecoration: "underline" }}>{selGames[0].venue_name}</Link> · <span className="num">{selGames[0].altitude_m.toLocaleString()} m</span>
+              <Link to={`/estadio/${selGames[0].stadium_id}`} style={{ textDecoration: "underline" }}>{selGames[0].venue_name}</Link> · <span className="num">{fmtInt(lang, selGames[0].altitude_m)} m</span>
               {selGames.map((g, k) => g.result && <span key={k} className="num"> · {g.result} {g.runs_for}-{g.runs_against}</span>)}
             </div>
           </div>
