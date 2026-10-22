@@ -2,6 +2,7 @@ import { useEffect, useRef } from "react";
 import { Navigate, NavLink, Route, Routes, useLocation } from "react-router-dom";
 import { InstallHint, OfflineBanner } from "./components/AppNotices";
 import { BottomNav } from "./components/BottomNav";
+import { BullpenButton } from "./components/BullpenButton";
 import { IntroVideo } from "./components/IntroVideo";
 import { Diablo } from "./components/Diablo";
 import { useLang } from "./i18n";
@@ -28,10 +29,10 @@ export default function App() {
           <span>Diablos Stuff<span className="plus">+</span></span>
         </NavLink>
         <nav className="nav nav-desktop" aria-label={t("mainNav")}>
-          <NavLink to="/" end>{t("navToday")}</NavLink>
+          <NavLink to="/" end>{t("navExplore")}</NavLink>
+          <NavLink to="/hoy">{t("navToday")}</NavLink>
           <NavLink to="/agentes-libres">{t("navFreeAgents")}</NavLink>
           <NavLink to="/y-si">{t("navWhatIf")}</NavLink>
-          <NavLink to="/explorar">{t("navExplore")}</NavLink>
           <NavLink to="/metodologia">{t("navMethod")}</NavLink>
         </nav>
         <div className="spacer" />
@@ -46,8 +47,10 @@ export default function App() {
       <OfflineBanner />
       <div id="main" tabIndex={-1} className="route" key={pathname}>
         <Routes>
-          <Route path="/" element={<TodayPage />} />
-          <Route path="/explorar" element={<ExplorePage />} />
+          {/* Explorar es la pantalla de inicio; /explorar se queda para los enlaces que ya existían */}
+          <Route path="/" element={<ExplorePage />} />
+          <Route path="/hoy" element={<TodayPage />} />
+          <Route path="/explorar" element={<Navigate to="/" replace />} />
           <Route path="/estadio/:id" element={<StadiumPage />} />
           <Route path="/lanzador/:id" element={<PitcherPage />} />
           <Route path="/agentes-libres" element={<FreeAgentsPage />} />
@@ -59,6 +62,7 @@ export default function App() {
       {/* el aviso de instalación va al final: si aparece tarde (Android), no empuja el contenido */}
       <InstallHint />
       <BottomNav />
+      <BullpenButton />
       <IntroVideo />
     </>
   );
