@@ -93,3 +93,10 @@ export function leaguePitchEffect(t: T, lang: Lang, r: { ivb_sea: number; ivb_he
   const keptPct = sea > 0 ? Math.round((Math.hypot(r.ivb_here, r.hb_here) / sea) * 100) : 100;
   return { text: parts.length ? parts.join(" · ") : t("lp_same"), keptPct };
 }
+
+/** Diferencia de Stuff+ contra nivel del mar, para mostrarla con la cifra aparte: "+2.0" + "contra nivel del mar". */
+export function vsSea(here: number | null | undefined, sea: number | null | undefined): number | null {
+  if (here == null || sea == null) return null;
+  const d = Math.round((here - sea) * 10) / 10;
+  return d === 0 ? 0 : d;
+}
