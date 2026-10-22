@@ -66,7 +66,7 @@ export default function MethodologyPage() {
   const { t, d } = useLang();
   const { data } = useApi<Methodology>("/methodology");
   const { data: stadiums } = useApi<Stadium[]>("/stadiums");
-  if (!data) return <main className="page"><div className="empty-state">{t("loading")}</div></main>;
+  if (!data) return <main className="page" aria-busy="true"><div className="skel skel-line" /><div className="skel skel-card" /></main>;
   const v = data.validation;
   const b = data.bayesball;
 

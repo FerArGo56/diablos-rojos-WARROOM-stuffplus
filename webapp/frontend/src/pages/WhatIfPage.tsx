@@ -26,7 +26,7 @@ export default function WhatIfPage() {
   };
 
   const { data: stadiums } = useApi<Stadium[]>("/stadiums");
-  const { data: proj, error } = useApi<Projection>(pid ? `/stadiums/${sid}/pitchers/${pid}` : null);
+  const { data: proj, error, retry } = useApi<Projection>(pid ? `/stadiums/${sid}/pitchers/${pid}` : null);
   const { data: top } = useApi<{ rows: LeaderRow[] }>(pid ? null : `/stadiums/${sid}/leaderboard`, { limit: 3 });
   const { data: fa } = useApi<FreeAgents>(pid ? "/free-agents" : null, { limit: 1 });
   const parks = stadiums ? [...stadiums].sort((a, b) => b.altitude_m - a.altitude_m) : [];
@@ -62,7 +62,7 @@ export default function WhatIfPage() {
         </section>
       )}
 
-      {pid && error && <p className="empty-note">{t("error")}</p>}
+      {pid && error && <div className="empty-note"><p>{t("error")}</p><button type="button" className="btn" onClick={retry}>{t("retry")}</button></div>}
       {pid && !error && !ready && <div className="skel skel-card" aria-busy="true" />}
       {ready && <Result proj={ready} fa={fa} isHome={sid === home} onHome={() => update({ s: home }, true)} />}
     </main>

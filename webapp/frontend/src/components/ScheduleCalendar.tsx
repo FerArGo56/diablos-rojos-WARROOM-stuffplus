@@ -40,7 +40,7 @@ export function ScheduleCalendar({ onHighlight }: { onHighlight?: (stadiumId: st
   const selStadium = selGames[0]?.stadium_id ?? null;
   useEffect(() => { onHighlight?.(selStadium); }, [selStadium, onHighlight]);
 
-  if (!data) return <div className="panel"><div className="muted">{t("loading")}</div></div>;
+  if (!data) return <div className="skel skel-card" aria-busy="true" />;
   if (!month) return null;
   const [y, m] = month.split("-").map(Number);
   const first = new Date(y, m - 1, 1);
