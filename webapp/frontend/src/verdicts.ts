@@ -35,8 +35,10 @@ export function verdictFor(stuff: number | null | undefined, scale: ParkScale | 
   return "avoid";
 }
 
-/** Fichajes, sobre la escala del Harp Helú. Con `fit` (vs. la mediana de nuestro staff en su rol) manda
- *  la regla del brief; sin staff con qué comparar (`fit` nulo) decide su lugar en la liga en casa. */
+/** Fichajes, sobre la escala del Harp Helú DE SU MISMO ROL (abridores contra abridores, relevistas contra
+ *  relevistas: los relevistas tiran más fuerte en salidas cortas y su Stuff+ es más alto).
+ *  Con `fit` (vs. la mediana de nuestro staff en su rol) manda la regla del brief; sin staff con qué
+ *  comparar (`fit` nulo) decide su lugar entre los de su rol en la liga en casa. */
 export const FA_RULES = {
   fitSign: 5,          // Fichar: fit ≥ +5 y al menos "Bueno" en casa
   fitWatch: 0,         // Vigilar: fit entre 0 y 5; No: fit < 0

@@ -31,21 +31,23 @@ export function stuffColor(v: number | null | undefined, scale: ParkScale | null
 const scaleCache = new Map<string, Promise<ParkScale | null>>();
 type Board = { rows: { stuff_plus: number }[] };
 
-/** Escala de veredictos del parque: percentiles del Stuff+ de toda la liga proyectada ahí. */
-export function useParkScale(stadiumId: string | null | undefined): ParkScale | null {
+/** Escala de veredictos del parque: percentiles del Stuff+ de toda la liga proyectada ahí
+ *  (o solo de un rol, para comparar abridores contra abridores y relevistas contra relevistas). */
+export function useParkScale(stadiumId: string | null | undefined, role?: "SP" | "RP"): ParkScale | null {
   const [scale, setScale] = useState<ParkScale | null>(null);
   useEffect(() => {
     if (!stadiumId) { setScale(null); return; }
     let alive = true;
-    let p = scaleCache.get(stadiumId);
+    const key = `${stadiumId}|${role ?? ""}`;
+    let p = scaleCache.get(key);
     if (!p) {
-      p = api<Board>(`/stadiums/${stadiumId}/leaderboard`, { limit: 500 }).then((b) => scaleFrom(b.rows.map((r) => r.stuff_plus)));
-      p.catch(() => scaleCache.delete(stadiumId));
-      scaleCache.set(stadiumId, p);
+      p = api<Board>(`/stadiums/${stadiumId}/leaderboard`, { limit: 500, role }).then((b) => scaleFrom(b.rows.map((r) => r.stuff_plus)));
+      p.catch(() => scaleCache.delete(key));
+      scaleCache.set(key, p);
     }
     p.then((s) => { if (alive) setScale(s); }).catch(() => { if (alive) setScale(null); });
     return () => { alive = false; };
-  }, [stadiumId]);
+  }, [stadiumId, role]);
   return scale;
 }
 
