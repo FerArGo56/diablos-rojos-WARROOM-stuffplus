@@ -591,3 +591,15 @@ table.data tbody th { text-transform: none; font-family: var(--body); font-size:
 .intro video { width: 100%; height: 100%; object-fit: cover; display: block; }
 .intro-skip { position: absolute; right: max(16px, env(safe-area-inset-right)); bottom: max(20px, env(safe-area-inset-bottom)); min-height: var(--tap); padding: 0 18px; border-radius: 999px; border: 1px solid rgba(255, 255, 255, 0.4); background: rgba(11, 11, 13, 0.55); color: #fff; font-family: var(--display); font-weight: 800; font-size: 15px; letter-spacing: 0.06em; text-transform: uppercase; backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
 .intro-skip:hover { background: rgba(11, 11, 13, 0.8); }
+
+/* ------------------------------------------------------------ trayectorias en 3D */
+.zone-hint { margin: calc(-1 * var(--sp-2)) 0 var(--sp-2); }
+.pitch3d { display: flex; flex-direction: column; flex: 1; }
+.pitch3d-svg { cursor: grab; touch-action: pan-y; border-radius: var(--radius-sm); background: radial-gradient(ellipse at 50% 70%, rgba(42, 27, 18, 0.35), transparent 70%); }
+.pitch3d-svg:active { cursor: grabbing; }
+.pitch3d-bar { display: flex; align-items: center; gap: var(--sp-2) var(--sp-3); flex-wrap: wrap; margin-top: var(--sp-2); }
+.pitch3d-legend { display: inline-flex; align-items: center; gap: 6px; margin-right: auto; }
+/* las zonas interactivas (2D y 3D) solo muestran el foco con teclado, con el rojo de la app */
+.zone-svg:focus { outline: none; }
+.zone-svg:focus-visible { outline: 2px solid var(--red-2); outline-offset: 2px; }
+.pitch3d-bar > .faint { flex-basis: 100%; }
