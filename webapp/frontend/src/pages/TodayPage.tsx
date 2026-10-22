@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { Link } from "react-router-dom";
 import type { Bullpen, Game, LeaderRow, Schedule, StadiumDetail } from "../api";
 import { BullpenList } from "../components/BullpenList";
+import { CountUp } from "../components/CountUp";
 import { Diablo } from "../components/Diablo";
 import { Term } from "../components/Term";
 import { Verdict } from "../components/Verdict";
@@ -65,7 +66,7 @@ export default function TodayPage() {
         <Link to={`/estadio/${bp.stadium.id}`} className="sb-park">
           <span className="sb-venue">{bp.stadium.venue_name}</span>
           <span className="sb-alt">
-            <span className="score" style={{ color: altitudeColor(alt) }}>{fmtInt(lang, alt)}<span className="sb-unit"> m</span></span>
+            <span className="score" style={{ color: altitudeColor(alt) }}><CountUp value={alt} format={(v) => fmtInt(lang, v)} /><span className="sb-unit"> m</span></span>
             <span className="sb-alt-l">{t("altitude")}</span>
           </span>
         </Link>

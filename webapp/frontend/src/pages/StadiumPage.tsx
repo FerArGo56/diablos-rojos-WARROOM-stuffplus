@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import type { LeaderRow, Projection, StadiumDetail } from "../api";
+import { CountUp } from "../components/CountUp";
 import { CrownIcon, Leaderboard } from "../components/Leaderboard";
 import { MovementPlot } from "../components/MovementPlot";
 import { SearchBox } from "../components/SearchBox";
@@ -51,8 +52,8 @@ export default function StadiumPage() {
           <h1>{st.venue_name}</h1>
           <p className="lede">{parkPhrase(t, lang, st)}</p>
           <div className="stats-row">
-            <div className="stat"><span className="v score" style={{ color: altitudeColor(st.altitude_m) }}>{fmtInt(lang, st.altitude_m)}<span className="sb-unit"> m</span></span><span className="l">{t("altitude")} · {st.city}</span></div>
-            <div className="stat"><span className="v score">{fmt(st.movement_retained_pct, 0)}<span className="sb-unit">%</span></span><span className="l">{t("movementRetained")} {t("vsSeaLevel")}</span></div>
+            <div className="stat"><span className="v score" style={{ color: altitudeColor(st.altitude_m) }}><CountUp value={st.altitude_m} format={(v) => fmtInt(lang, v)} /><span className="sb-unit"> m</span></span><span className="l">{t("altitude")} · {st.city}</span></div>
+            <div className="stat"><span className="v score"><CountUp value={st.movement_retained_pct} format={(v) => fmt(v, 0)} /><span className="sb-unit">%</span></span><span className="l">{t("movementRetained")} {t("vsSeaLevel")}</span></div>
           </div>
         </div>
         <button type="button" className="crown-btn" onClick={() => setCrown(true)}><CrownIcon size={26} /> {t("crownTitle")}</button>
