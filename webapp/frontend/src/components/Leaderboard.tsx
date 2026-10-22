@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import type { LeaderRow } from "../api";
 import { PITCH_NAMES, useLang } from "../i18n";
+import { Term } from "./Term";
 import { PITCH_COLORS, fmt, signed, stuffColor, useApi, useAppState } from "../state";
 
 type Board = { stadium_id: string; season: number; min_pitches: number; total: number; rows: LeaderRow[] };
@@ -43,7 +44,7 @@ export function Leaderboard({ stadiumId, venueName, onPick, onClose }: { stadium
           <table className="data">
             <thead><tr>
               <th>{t("rank")}</th><th>{t("pitcher")}</th><th>{t("team")}</th><th>{t("bestPitch")}</th>
-              <th className="r">Stuff+</th><th className="r">{t("neutral")}</th><th className="r">{t("altitudeDelta")}</th>
+              <th className="r"><Term k="stuff">Stuff+</Term></th><th className="r">{t("neutral")}</th><th className="r">{t("altitudeDelta")}</th>
             </tr></thead>
             <tbody>
               {data?.rows.map((r) => (

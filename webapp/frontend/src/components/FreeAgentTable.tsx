@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import type { FreeAgents } from "../api";
 import { PITCH_NAMES, useLang } from "../i18n";
+import { Term } from "./Term";
 import { PITCH_COLORS, fmt, signed, stuffColor, useApi, useAppState } from "../state";
 
 export function FreeAgentTable({ compact = false }: { compact?: boolean }) {
@@ -59,10 +60,10 @@ export function FreeAgentTable({ compact = false }: { compact?: boolean }) {
               <th>{t("pitcher")}</th>
               <th>{t("status")}</th>
               {!compact && <th>{t("role")}</th>}
-              <th className="r">{t("stuffHome")}</th>
+              <th className="r"><Term k="stuff">{t("stuffHome")}</Term></th>
               {!compact && <th className="r">{t("stuffNeutral")}</th>}
               {!compact && <th className="r">{t("altitudeDelta")}</th>}
-              <th className="r">{compact ? "Δ staff" : t("fit")}</th>
+              <th className="r"><Term k="fit">{compact ? "Δ staff" : t("fit")}</Term></th>
               {!compact && <th>{t("bestPitch")}</th>}
               {!compact && <th className="r">{t("lastSeason")}</th>}
             </tr>

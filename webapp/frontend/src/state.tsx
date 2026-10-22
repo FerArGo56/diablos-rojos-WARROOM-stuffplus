@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import { api, type Meta } from "./api";
+import { VERDICT_COLOR, verdictFor } from "./verdicts";
 
 export const PITCH_COLORS: Record<string, string> = {
   "Four-Seam": "#ff4d5e", Sinker: "#ff9f43", Cutter: "#c08a6a", Slider: "#ffd23f",
@@ -20,13 +21,10 @@ export function altitudeColor(alt: number): string {
   return `rgb(${c[0]},${c[1]},${c[2]})`;
 }
 
+/** Color de un Stuff+ suelto, con los mismos umbrales que el veredicto (src/verdicts.ts). */
 export function stuffColor(v: number | null | undefined): string {
-  if (v == null) return "var(--muted)";
-  if (v >= 110) return "var(--good-strong)";
-  if (v >= 103) return "var(--good)";
-  if (v <= 90) return "var(--bad-strong)";
-  if (v <= 97) return "var(--bad)";
-  return "var(--text)";
+  const k = verdictFor(v);
+  return k ? VERDICT_COLOR[k] : "var(--muted)";
 }
 
 export const fmt = (v: number | null | undefined, d = 1) => (v == null ? "–" : v.toFixed(d));
