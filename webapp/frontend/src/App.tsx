@@ -2,6 +2,7 @@ import { useEffect, useRef } from "react";
 import { Navigate, NavLink, Route, Routes, useLocation } from "react-router-dom";
 import { InstallHint, OfflineBanner } from "./components/AppNotices";
 import { BottomNav } from "./components/BottomNav";
+import { IntroSplash } from "./components/IntroSplash";
 import { Diablo } from "./components/Diablo";
 import { useLang } from "./i18n";
 import { useAppState } from "./state";
@@ -57,6 +58,7 @@ export default function App() {
         </Routes>
       </div>
       <BottomNav />
+      <IntroSplash />
     </>
   );
 }

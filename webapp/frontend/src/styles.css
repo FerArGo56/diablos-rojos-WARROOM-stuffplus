@@ -62,6 +62,7 @@
   --z-overlay: 50;
   --z-dialog: 51;
   --z-tooltip: 60;
+  --z-intro: 100;
   --bottomnav-h: 60px;
 }
 
@@ -583,3 +584,10 @@ table.data tbody th { text-transform: none; font-family: var(--body); font-size:
 /* ícono con CSS: triángulo = reproducir; dos barras = pausar */
 .loop-video-btn span { width: 14px; height: 16px; background: var(--text); clip-path: polygon(15% 0, 100% 50%, 15% 100%); }
 .loop-video-btn.is-playing span { clip-path: polygon(0 0, 35% 0, 35% 100%, 0 100%, 0 0, 65% 0, 100% 0, 100% 100%, 65% 100%, 65% 0); }
+
+/* ------------------------------------------------------------ intro a pantalla completa */
+.intro { position: fixed; inset: 0; z-index: var(--z-intro); background: #000; opacity: 1; transition: opacity 300ms var(--ease-out); cursor: pointer; }
+.intro.is-leaving { opacity: 0; pointer-events: none; }
+.intro video { width: 100%; height: 100%; object-fit: cover; display: block; }
+.intro-skip { position: absolute; right: max(16px, env(safe-area-inset-right)); bottom: max(20px, env(safe-area-inset-bottom)); min-height: var(--tap); padding: 0 18px; border-radius: 999px; border: 1px solid rgba(255, 255, 255, 0.4); background: rgba(11, 11, 13, 0.55); color: #fff; font-family: var(--display); font-weight: 800; font-size: 15px; letter-spacing: 0.06em; text-transform: uppercase; backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
+.intro-skip:hover { background: rgba(11, 11, 13, 0.8); }
